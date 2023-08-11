@@ -1,0 +1,58 @@
+
+package:
+  name: zipline-tardis-bundle
+  version: 0.1.0
+
+source:
+  git_url: https://github.com/phelps-sg/zipline-tardis-bundle
+
+
+requirements:
+  build:
+    - python=3.10
+  host:
+    - python=3.10
+    - pip
+  run:
+    - python=3.10
+    - numpy
+    - pandas
+    - pandas-stubs
+    - pre-commit
+    - blackd
+    - pylint
+    - pytest
+    - pytest-mock
+    - pydrive
+    - mypy
+    - zipline-reloaded
+    - pyfolio-reloaded
+    - pip
+    - ray-default
+    - grpcio=1.43
+    - fn
+    - pykalman
+#    - pip:
+#        - mPyPl
+#        - tardis-client
+#        - tardis_dev
+#        - backtrader
+
+
+test:
+  commands:
+    - pip check
+    - python -c "import zipline_tardis_bundle; print(zipline_tardis_bundle.__version__)"
+    - conda update --all -y
+  requires:
+    - pip
+
+about:
+  home: https://github.com/phelps-sg/zipline-tardis-bundle
+  summary: A Zipline bundle for TARDIS data
+  license: Apache-2.0
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - steve-phelps
