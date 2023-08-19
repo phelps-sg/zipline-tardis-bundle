@@ -7,13 +7,17 @@ source:
   git_url: git@github.com:phelps-sg/zipline-tardis-bundle.git
 
 build:
-  script: pip install . -vv
+  script: {{ PYTHON }} -m pip install . -vv
 
 requirements:
   build:
     - python
-    - setuptools
+    - cython
+    - numpy
   host:
+    - python
+    - cython
+    - numpy
     - pip
   run:
 #    - numpy
