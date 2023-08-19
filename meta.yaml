@@ -16,24 +16,24 @@ requirements:
   host:
     - pip
   run:
-    - numpy
-    - pandas
-    - pandas-stubs
-    - pre-commit
-    - blackd
-    - pylint
-    - pytest
-    - pytest-mock
-    - pydrive
-    - mypy
-    - zipline-reloaded
-    - pyfolio-reloaded
+#    - numpy
+#    - pandas
+#    - pandas-stubs
+#    - pre-commit
+#    - blackd
+#    - pylint
+#    - pytest
+#    - pytest-mock
+#    - pydrive
+#    - mypy
+#    - zipline-reloaded
+#    - pyfolio-reloaded
+#    - pip
+#    - ray-default
+#    - grpcio=1.43
+#    - fn
+#    - pykalman
     - pip
-    - ray-default
-    - grpcio=1.43
-    - fn
-    - pykalman
-#    - pip:
 #        - mPyPl
 #        - tardis-client
 #        - tardis_dev
