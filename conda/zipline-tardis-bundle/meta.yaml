@@ -20,6 +20,7 @@ requirements:
     - numpy
     - pip
   run:
+    - python>=3.10
 #    - numpy
 #    - pandas
 #    - pandas-stubs
@@ -47,7 +48,7 @@ requirements:
 test:
   commands:
     - pip check
-    - python -c "import zipline_tardis_bundle; print(zipline_tardis_bundle.__version__)"
+    - python -c "import zipline_tardis_bundle"
     - conda update --all -y
   requires:
     - pip
