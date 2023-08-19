@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name="zipline-tardis-bundle",
     version="0.1.0",
-    packages=[],
+    packages=find_packages(),
     url="",
     license="MIT",
     author="Steve Phelps",
