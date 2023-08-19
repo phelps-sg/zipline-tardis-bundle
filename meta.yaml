@@ -6,6 +6,8 @@ package:
 source:
   git_url: git@github.com:phelps-sg/zipline-tardis-bundle.git
 
+#build:
+#  script: python -m pip install . -vv
 
 requirements:
   build:
@@ -14,7 +16,6 @@ requirements:
   host:
     - pip
   run:
-    - python=3.10
     - numpy
     - pandas
     - pandas-stubs
