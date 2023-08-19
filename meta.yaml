@@ -4,14 +4,14 @@ package:
   version: 0.1.0
 
 source:
-  git_url: https://github.com/phelps-sg/zipline-tardis-bundle
+  git_url: git@github.com:phelps-sg/zipline-tardis-bundle.git
 
 
 requirements:
   build:
     - python=3.10
+    - setuptools
   host:
-    - python=3.10
     - pip
   run:
     - python=3.10
