@@ -23,8 +23,6 @@ dependencies:
  - fn
  - pykalman
  - pip:
-   - mPyPl
    - tardis-client
    - tardis_dev
-   - backtrader
    - -e ./
