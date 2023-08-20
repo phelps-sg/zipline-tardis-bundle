@@ -20,14 +20,13 @@ import numpy as np
 import pandas as pd
 from fn import F
 from ray.util.client import RayAPIStub, ray
-from tardis_dev import datasets
+from tardis_dev import datasets, get_exchange_details  # type: ignore
 from typing_extensions import override
 from zipline.assets import AssetDBWriter
 from zipline.data.adjustments import SQLiteAdjustmentWriter
 from zipline.data.bcolz_daily_bars import BcolzDailyBarWriter
 from zipline.data.bcolz_minute_bars import BcolzMinuteBarWriter
 from zipline.data.bundles import register
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -535,3 +534,53 @@ def _data_pipeline(
             )
         logger.info("Ingestion for %s complete.", asset.symbol)
         yield sid, pricing_data, _generate_metadata(pricing_data, asset)
+
+
+@lru_cache
+def exchange_details_cached(exchange: str) -> dict:
+    return get_exchange_details(exchange)
+
+
+@lru_cache
+def all_symbols(exchange: str) -> set[str]:
+    """
+    Query the Tardis API to obtain the entire set of symbols for the
+    specified exchange.
+
+    @param exchange: The exchange to query
+    @return: The entire set of symbols traded on the exchange
+    """
+    info = exchange_details_cached(exchange)
+    return {s["id"] for s in info["availableSymbols"]}
+
+
+_currency_reg_ex = re.compile(r"^([A-Z0-9]+)-([A-Z0-9]+)$")
+
+
+@lru_cache
+def live_symbols_since(exchange: str, date: str, fiat_currency: str = None) -> set[str]:
+    """
+    Query the Tardis API to obtain the set of symbols that are
+    currently actively traded and also have historical data
+    going back to at least the specified date.
+
+    @param exchange: The exchange to query
+    @param date: Symbols must have data going back
+        to this date or earlier
+    @param fiat_currency: Only include pairs for the specified
+        fiat currency
+    @return: The corresponding set of symbols
+    """
+    range_start = utc_timestamp(date)
+    info = exchange_details_cached(exchange)
+    return {
+        s["id"]
+        for s in info["availableSymbols"]
+        if ("availableTo" not in s)
+        and ("availableSince" in s)
+        and (pd.Timestamp(s["availableSince"]) <= range_start)
+        and (
+            (fiat_currency is None)
+            or (_currency_reg_ex.match(s["id"]).group(2) == fiat_currency)
+        )
+    }
