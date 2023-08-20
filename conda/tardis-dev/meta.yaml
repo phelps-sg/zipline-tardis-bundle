@@ -1,0 +1,41 @@
+{% set name = "tardis-dev" %}
+{% set version = "2.0.0a13" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://files.pythonhosted.org/packages/20/be/0d37bb16e2e995c9b3e8df2a1d72c180a4ba2b7c52052b4b0e64ffeb84a4/{{ name }}-{{ version }}.tar.gz
+  md5: 7e75ae655362dd39687de61eaef0b089
+
+build:
+  number: 0
+  skip: true # [py<37 or not x86_64]
+  include_recipe: False
+  script: {{ PYTHON }} -m pip install . -vv
+
+requirements:
+  build:
+    - python
+    - cython
+    - numpy
+    - poetry>=0.12
+  run:
+    - python>=3.7
+    - aiohttp=3.8.1
+    - aiofiles=0.8.0
+    - sortedcontainers=2.1
+    - python-dateutil=2.8.2
+
+test:
+  imports:
+    - tardis_dev
+
+#about:
+#  home: https://github.com/tardis-dev/tardis-python
+#  license: Mozilla Public License 2.0
+
+extra:
+  maintainers:
+   - https://github.com/phelps-sg

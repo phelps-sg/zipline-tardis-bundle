@@ -1,0 +1,40 @@
+{% set name = "tardis-client" %}
+{% set version = "1.3.4" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://files.pythonhosted.org/packages/91/8d/bd61452ceb0d4686c8526c0f2ba23116375834fde3f5eec5a46fc2e93035/{{ name }}-{{ version }}.tar.gz
+  md5: 93463a899e51e69230d7ac23c762f834
+
+build:
+  number: 0
+  skip: true # [py<37 or not x86_64]
+  include_recipe: False
+  script: {{ PYTHON }} -m pip install . -vv
+
+requirements:
+  build:
+    - python
+    - cython
+    - numpy
+    - poetry
+  run:
+    - python>=3.7
+    - aiohttp=3.8.1
+    - aiofiles=0.8.0
+    - sortedcontainers=2.1
+
+test:
+  imports:
+    - tardis_client
+
+about:
+  home: https://github.com/tardis-dev/tardis-python
+  license: Mozilla Public License 2.0
+
+extra:
+  maintainers:
+   - https://github.com/phelps-sg

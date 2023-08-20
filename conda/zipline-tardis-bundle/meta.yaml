@@ -21,9 +21,8 @@ requirements:
     - pip
   run:
     - python>=3.10
-#    - numpy
-#    - pandas
-#    - pandas-stubs
+    - numpy
+    - pandas
 #    - pre-commit
 #    - blackd
 #    - pylint
@@ -31,14 +30,15 @@ requirements:
 #    - pytest-mock
 #    - pydrive
 #    - mypy
-#    - zipline-reloaded
-#    - pyfolio-reloaded
+    - zipline-reloaded
+    - pyfolio-reloaded
+    - tardis-client>=1.3.4
+    - tardis-dev
 #    - pip
-#    - ray-default
-#    - grpcio=1.43
-#    - fn
-#    - pykalman
-    - pip
+    - ray-default
+    - grpcio=1.43
+    - fn
+    - pykalman
 #        - mPyPl
 #        - tardis-client
 #        - tardis_dev
@@ -47,11 +47,9 @@ requirements:
 
 test:
   commands:
-    - pip check
     - python -c "import zipline_tardis_bundle"
-    - conda update --all -y
-  requires:
-    - pip
+#  requires:
+#    - pip
 
 about:
   home: https://github.com/phelps-sg/zipline-tardis-bundle

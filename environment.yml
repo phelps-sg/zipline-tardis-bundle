@@ -1,0 +1,30 @@
+name: zipline-tardis-bundle
+channels:
+ - conda-forge
+dependencies:
+ - boa
+ - anaconda-client
+ - python=3.10
+ - numpy
+ - pandas
+ - pandas-stubs
+ - pre-commit
+ - blackd
+ - pylint
+ - pytest
+ - pytest-mock
+ - mypy
+ - zipline-reloaded
+ - pyfolio-reloaded
+ - pip
+ - ray-default
+ - grpcio=1.43
+ - openai
+ - fn
+ - pykalman
+ - pip:
+   - mPyPl
+   - tardis-client
+   - tardis_dev
+   - backtrader
+   - -e ./
