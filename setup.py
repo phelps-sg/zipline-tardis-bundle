@@ -7,6 +7,5 @@ setup(
     license="MIT",
     author="Steve Phelps",
     author_email="sphelps@sphelps.net",
-    description="Zipline bundle to ingest TARDIS data",
-    # install_requires=['mPyPl', 'tardis-client', 'tardis_dev']
+    description="Zipline bundle to ingest TARDIS data"
 )
