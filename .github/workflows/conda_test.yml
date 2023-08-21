@@ -1,0 +1,47 @@
+name: Conda Test
+
+on:
+  workflow_dispatch
+
+jobs:
+  build_wheels:
+    name: py${{ matrix.python }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    env:
+      ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+        python: [ '3.7', '3.8', '3.9', '3.10' ]
+
+    steps:
+
+      - name: Checkout zipline-reloaded
+        uses: actions/checkout@v3
+
+      - name: Setup miniconda3
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
+          auto-update-conda: true
+          channel-priority: strict
+          mamba-version: "*"
+          python-version: ${{ matrix.python }}
+          activate-environment: test
+          channels: conda-forge, mesonomics, file:///tmp/channel
+
+      - name: conda build for ${{ matrix.os }}
+        run: |
+          conda activate recipe
+          conda install -y -n recipe boa
+          conda mambabuild --output-folder . --python ${{ matrix.python }} conda/zipline-tardis-bundle
+          mkdir -p /tmp/channel/linux64
+          cp linux64/zipline-tardis-bundle*.tar.bz2 /tmp/channel
+          conda index /tmp/channel
+          conda activate test
+          conda install -y --override-channels -c file:///tmp/channel -c mesonomics -c conda-forge zipline-tardis-bundle
