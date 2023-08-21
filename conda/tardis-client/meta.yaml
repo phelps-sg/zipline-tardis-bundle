@@ -22,7 +22,7 @@ requirements:
     - numpy
     - poetry
   run:
-    - python>=3.7,<3.11
+    - python>=3.7
     - aiohttp=3.8.1
     - aiofiles=0.8.0
     - sortedcontainers=2.1
