@@ -52,7 +52,7 @@ jobs:
       - name: conda build for ${{ matrix.os }}
         run: |
           mamba activate recipe
-          mamba install -n recipe boa conda-verify anaconda-client
+          mamba install -y -n recipe boa conda-verify anaconda-client
           conda mambabuild --output-folder . --python ${{ matrix.python }} conda/zipline-tardis-bundle
 
       - name: activate uploader
