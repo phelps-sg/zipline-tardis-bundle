@@ -1,0 +1,8 @@
+name: zipline-tardis-bundle-test
+channels:
+ - conda-forge
+dependencies:
+ - python=3.10
+ - pytest
+ - pytest-mock
+ - mypy
