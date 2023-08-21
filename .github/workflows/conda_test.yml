@@ -37,8 +37,9 @@ jobs:
 
       - name: conda build for ${{ matrix.os }}
         run: |
-          conda activate recipe
+          conda create -n recipe python=${{ matrix.python }}
           conda install -y -n recipe boa
+          conda activate boa
           conda mambabuild --output-folder . --python ${{ matrix.python }} conda/zipline-tardis-bundle
           mkdir -p /tmp/channel/linux64
           cp linux64/zipline-tardis-bundle*.tar.bz2 /tmp/channel
