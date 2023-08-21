@@ -33,7 +33,7 @@ jobs:
           mamba-version: "*"
           python-version: ${{ matrix.python }}
           activate-environment: test
-          channels: conda-forge, mesonomics, file:///tmp/channel
+          channels: conda-forge, mesonomics
 
       - name: conda build for ${{ matrix.os }}
         run: |
@@ -45,3 +45,4 @@ jobs:
           conda index /tmp/channel
           conda activate test
           conda install -y --override-channels -c file:///tmp/channel -c mesonomics -c conda-forge zipline-tardis-bundle
+          
