@@ -56,8 +56,11 @@ jobs:
           mkdir -p /tmp/channel/linux-64
           cp linux-64/zipline-tardis-bundle*.tar.bz2 /tmp/channel/linux-64
 
+      - name: index local channel
+          conda activate recipe
+          conda index /tmp/channel
+
       - name: install zipline-tardis-bundle into test environment
         run: |
-          conda index /tmp/channel
           conda activate test
           conda install -y --override-channels -c file:///tmp/channel -c mesonomics -c conda-forge zipline-tardis-bundle
