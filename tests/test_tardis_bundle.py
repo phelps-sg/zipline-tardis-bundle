@@ -388,7 +388,7 @@ class TestTardisBundle:
 
     def test_extension(self, mocker, zipline_environment):
         mocker.patch("os.environ", zipline_environment)
-        runpy.run_path("./extension.py")
+        runpy.run_path("../zipline_tardis_bundle/extension.py")
         tardis_bundles = [bundle for bundle in bundles.bundles if "tardis" in bundle]
         assert len(tardis_bundles) > 0
         for bundle in tardis_bundles:
