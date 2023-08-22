@@ -52,8 +52,8 @@ jobs:
 
       - name: create local channel
         run: |
-          mkdir -p /tmp/channel/linux64
-          cp linux64/zipline-tardis-bundle*.tar.bz2 /tmp/channel/linux64
+          mkdir -p /tmp/channel/linux-64
+          cp linux-64/zipline-tardis-bundle*.tar.bz2 /tmp/channel/linux-64
 
       - name: install zipline-tardis-bundle into test environment
         run: |
