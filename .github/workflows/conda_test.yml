@@ -21,7 +21,7 @@ jobs:
 
     steps:
 
-      - name: Checkout zipline-reloaded
+      - name: Checkout
         uses: actions/checkout@v3
 
       - name: Setup miniconda3
@@ -51,6 +51,7 @@ jobs:
           cp linux64/zipline-tardis-bundle*.tar.bz2 /tmp/channel
 
       - name: install zipline-tardis-bundle into test environment
+        run: |
           conda index /tmp/channel
           conda activate test
           conda install -y --override-channels -c file:///tmp/channel -c mesonomics -c conda-forge zipline-tardis-bundle
