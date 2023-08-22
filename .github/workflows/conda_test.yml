@@ -29,8 +29,8 @@ jobs:
         with:
           miniconda-version: "latest"
           auto-update-conda: true
-          channel-priority: strict
-          mamba-version: "*"
+#          channel-priority: strict
+#          mamba-version: "*"
           python-version: ${{ matrix.python }}
           activate-environment: test
           channels: conda-forge, mesonomics
@@ -39,6 +39,11 @@ jobs:
         run: |
           conda create -n recipe python=${{ matrix.python }}
           conda install -y -n recipe boa conda-build
+
+      - name: conda info
+        run: |
+          conda info
+          conda list
 
       - name: conda build for ${{ matrix.os }}
         run: |
