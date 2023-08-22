@@ -388,7 +388,7 @@ class TestTardisBundle:
 
     def test_extension(self, mocker, zipline_environment):
         mocker.patch("os.environ", zipline_environment)
-        runpy.run_path("./zipline_tardis_bundle/extension.py")
+        runpy.run_path("./extension.py")
         tardis_bundles = [bundle for bundle in bundles.bundles if "tardis" in bundle]
         assert len(tardis_bundles) > 0
         for bundle in tardis_bundles:
@@ -425,7 +425,7 @@ class TestTardisBundle:
 
         mocker.patch(
             "zipline_tardis_bundle.CSV_DIR",
-            "./tests/data/tardis_bundle",
+            "./data/tardis_bundle",
         )
         mocker.patch(
             "zipline_tardis_bundle._download_data",
@@ -544,7 +544,7 @@ class TestTardisBundle:
         )
         mocker.patch(
             "zipline_tardis_bundle.CSV_DIR",
-            "./tests/data/tardis_bundle",
+            "./data/tardis_bundle",
         )
         trading_calendar = ingest(
             zipline_environment,
@@ -561,7 +561,7 @@ class TestTardisBundle:
             zipline_environment,
             test_bundle_name,
             trading_calendar,
-            test_algo_file="./tests/zipline_strategy.py",
+            test_algo_file="./zipline_strategy.py",
             test_capital_base=100000,
             test_data_frequency="minute",
         )
