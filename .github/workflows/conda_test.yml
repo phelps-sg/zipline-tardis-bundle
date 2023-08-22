@@ -65,3 +65,9 @@ jobs:
         run: |
           conda activate test
           conda install -y --override-channels -c file:///tmp/channel -c mesonomics -c conda-forge zipline-tardis-bundle
+
+      - name: run pytest
+        run: |
+          conda activate test
+          cd tests
+          pytest
