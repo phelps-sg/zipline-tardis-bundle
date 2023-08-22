@@ -17,10 +17,15 @@ import shutil
 
 ZIPLINE_CONFIG_FILENAME = "extension.py"
 
-if __name__ == "__main__":
+
+def main() -> None:
     filename = ZIPLINE_CONFIG_FILENAME
     home_dir = os.path.expanduser("~")
     dest_file = os.path.join(home_dir, filename)
     module_dir = os.path.basename(__file__)
     source_file = os.path.join(module_dir, filename)
     shutil.copy(source_file, dest_file)
+
+
+if __name__ == "__main__":
+    main()
