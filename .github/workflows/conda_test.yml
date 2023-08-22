@@ -69,5 +69,6 @@ jobs:
       - name: run pytest
         run: |
           conda activate test
+          conda install -n test pytest pytest-mock mypy
           cd tests
           pytest
