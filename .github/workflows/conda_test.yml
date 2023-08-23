@@ -55,8 +55,16 @@ jobs:
 
       - name: create local channel
         run: |
-          mkdir -p /tmp/channel/linux-64
-          cp linux-64/zipline-tardis-bundle*.tar.bz2 /tmp/channel/linux-64
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            OS_SUBDIR=linux-64
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            OS_SUBDIR=win-64
+          else
+            echo "Unsupported OS!"
+            exit 1
+          fi
+          mkdir -p /tmp/channel/$OS_SUBDIR
+          cp $OS_SUBDIR/zipline-tardis-bundle*.tar.bz2 /tmp/channel/$OS_SUBDIR/
 
       - name: index local channel
         run: |
