@@ -1,0 +1,64 @@
+name: Conda Package Dependencies
+
+on:
+  workflow_dispatch
+
+jobs:
+  build:
+    name: py${{ matrix.python }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    env:
+      ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        python: [ '3.7', '3.8', '3.9', '3.10', '3.11' ]
+        recipe: [ 'tardis-client', 'tardis-dev' ]
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup miniconda3
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
+          auto-update-conda: true
+#          channel-priority: strict
+#          mamba-version: "*"
+          python-version: ${{ matrix.python }}
+          activate-environment: test
+          channels: conda-forge, mesonomics
+
+      - name: configure recipe conda environment
+        run: |
+          conda create -n recipe python=${{ matrix.python }}
+          conda install -y -n recipe conda-build
+
+      - name: conda info
+        run: |
+          conda info
+          conda list
+
+      - name: conda build for ${{ matrix.os }}
+        run: |
+          conda activate recipe
+          conda build --output-folder . -c conda-forge --python ${{ matrix.python }} conda/${{ matrix.recipe }}
+
+      - name: upload windows
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: anaconda upload win-64/*.tar.bz2
+
+      - name: upload linux
+        if: ${{ matrix.os  == 'ubuntu-latest' }}
+        run: anaconda upload linux-64/*.tar.bz2
+
+      - name: upload macos
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: anaconda upload osx-64/*.tar.bz2
