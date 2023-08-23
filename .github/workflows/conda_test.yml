@@ -76,7 +76,7 @@ jobs:
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             conda install -y --override-channels -c file:///tmp/channel -c mesonomics -c conda-forge zipline-tardis-bundle
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            conda install -y --override-channels -c file:///C/channel -c mesonomics -c conda-forge zipline-tardis-bundle
+            conda install -y --override-channels -c file:///C:/channel -c mesonomics -c conda-forge zipline-tardis-bundle
           fi
 
       - name: run pytest
