@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
-        python: [ '3.7', '3.8', '3.9', '3.10', '3.11' ]
+        python: [ '3.8', '3.9', '3.10' ]
         recipe: [ 'tardis-client', 'tardis-dev' ]
 
     steps:
@@ -30,8 +30,6 @@ jobs:
         with:
           miniconda-version: "latest"
           auto-update-conda: true
-#          channel-priority: strict
-#          mamba-version: "*"
           python-version: ${{ matrix.python }}
           activate-environment: test
           channels: conda-forge, mesonomics
