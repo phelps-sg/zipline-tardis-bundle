@@ -24,6 +24,11 @@ jobs:
           auto-update-conda: true
           activate-environment: test
 
+      - name: conda info
+        run: |
+          conda info
+          conda list
+
       # Download the corresponding artifact based on the matrix OS
       - name: Download artifact
         uses: dawidd6/action-download-artifact@v2
@@ -33,13 +38,7 @@ jobs:
 
       # Install anaconda-client if not available in the test environment
       - name: Install Anaconda client
-        run: |
-          conda activate test
-          if ! command -v anaconda &> /dev/null
-          then
-              echo "anaconda-client is not installed. Installing now..."
-              conda install anaconda-client -y
-          fi
+        run: conda install -y -n test anaconda-client
 
       # Ensure version consistency between the GitHub release and the conda package
 #      - name: Check version consistency
@@ -55,5 +54,4 @@ jobs:
       # Uploading to Anaconda
       - name: Upload to Anaconda
         run: |
-          conda activate test
           anaconda upload *.tar.bz2
