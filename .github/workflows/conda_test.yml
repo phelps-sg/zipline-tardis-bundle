@@ -1,7 +1,9 @@
 name: Conda Test
 
 on:
-  workflow_dispatch
+  push:
+    branches:
+      - main
 
 jobs:
   build_wheels:
@@ -72,3 +74,35 @@ jobs:
           conda install -n test pytest pytest-mock mypy
           cd tests
           pytest
+
+      - name: Set HOME_PATH based on OS
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            echo "HOME_PATH=${USERPROFILE}" >> $GITHUB_ENV
+          else
+            echo "HOME_PATH=${HOME}" >> $GITHUB_ENV
+          fi
+
+      - name: test install
+        run: |
+          conda activate test
+          install-tardis-bundle
+          rm $HOME_PATH/.zipline/extension.py
+
+      - name: store macos result
+        uses: actions/upload-artifact@v3
+        if: ${{ matrix.os == 'macos-latest' }}
+        with:
+          path: osx-64/*.tar.bz2
+
+      - name: store linux result
+        uses: actions/upload-artifact@v3
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        with:
+          path: linux-64/*.tar.bz2
+
+      - name: store windows result
+        uses: actions/upload-artifact@v3
+        if: ${{ matrix.os == 'windows-latest' }}
+        with:
+          path: win-64/*.tar.bz2
