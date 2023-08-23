@@ -104,16 +104,19 @@ jobs:
         uses: actions/upload-artifact@v3
         if: ${{ matrix.os == 'macos-latest' }}
         with:
+          name: build-osx-64
           path: osx-64/*.tar.bz2
 
       - name: store linux result
         uses: actions/upload-artifact@v3
         if: ${{ matrix.os == 'ubuntu-latest' }}
         with:
+          name: build-linux-64
           path: linux-64/*.tar.bz2
 
       - name: store windows result
         uses: actions/upload-artifact@v3
         if: ${{ matrix.os == 'windows-latest' }}
         with:
+          name: build-win-64
           path: win-64/*.tar.bz2

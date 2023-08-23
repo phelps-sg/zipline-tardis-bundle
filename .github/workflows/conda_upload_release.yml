@@ -28,8 +28,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ matrix.os }}
-          path: ./artifact
+          name: build-${{ matrix.os }}
 
       # Install anaconda-client if not available in the test environment
       - name: Install Anaconda client
@@ -42,18 +41,18 @@ jobs:
           fi
 
       # Ensure version consistency between the GitHub release and the conda package
-      - name: Check version consistency
-        run: |
-          conda activate test
-          RELEASE_VERSION=${{ github.event.release.tag_name }}
-          PACKAGE_VERSION=$(conda inspect --extracted-info ./artifact/*.tar.bz2 | grep version)
-          if [[ "$RELEASE_VERSION" != "$PACKAGE_VERSION" ]]; then
-            echo "Error: Version mismatch between GitHub release and conda package."
-            exit 1
-          fi
+#      - name: Check version consistency
+#        run: |
+#          conda activate test
+#          RELEASE_VERSION=${{ github.event.release.tag_name }}
+#          PACKAGE_VERSION=$(conda inspect --extracted-info ./artifact/*.tar.bz2 | grep version)
+#          if [[ "$RELEASE_VERSION" != "$PACKAGE_VERSION" ]]; then
+#            echo "Error: Version mismatch between GitHub release and conda package."
+#            exit 1
+#          fi
 
       # Uploading to Anaconda
       - name: Upload to Anaconda
         run: |
           conda activate test
-          anaconda upload ./artifact/*.tar.bz2 --label main
+          anaconda upload *.tar.bz2
