@@ -39,7 +39,7 @@ jobs:
       - name: configure recipe conda environment
         run: |
           conda create -n recipe python=${{ matrix.python }}
-          conda install -y -n recipe conda-build
+          conda install -y -n recipe conda-build anaconda-client
 
       - name: conda info
         run: |
