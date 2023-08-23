@@ -21,7 +21,9 @@ ZIPLINE_CONFIG_FILENAME = "extension.py"
 def main() -> None:
     filename = ZIPLINE_CONFIG_FILENAME
     home_dir = os.path.expanduser("~")
-    dest_file = os.path.join(home_dir, filename)
+    zipline_dir = os.path.join(home_dir, ".zipline")
+    os.makedirs(zipline_dir, exist_ok=True)
+    dest_file = os.path.join(zipline_dir, filename)
     module_dir = os.path.basename(__file__)
     source_file = os.path.join(module_dir, filename)
     shutil.copy(source_file, dest_file)
