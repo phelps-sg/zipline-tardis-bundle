@@ -12,8 +12,9 @@ A bundle for [zipline-reloaded](https://zipline.ml4trading.io/) to allow data fo
 ### 1. Install a conda distribution
 
 If not already installed, install either:
-    - [Anaconda](https://www.anaconda.com/download/) or,
-    - [mambaforge](https://github.com/conda-forge/miniforge#mambaforge) (recommended).
+
+- [Anaconda](https://www.anaconda.com/download/) or,
+- [mambaforge](https://github.com/conda-forge/miniforge#mambaforge) (recommended).
 
 ### 2. Install the conda package:
 
