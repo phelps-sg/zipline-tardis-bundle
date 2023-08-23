@@ -53,8 +53,7 @@ jobs:
           conda activate recipe
           conda build --output-folder . -c conda-forge -c mesonomics --python ${{ matrix.python }} conda/zipline-tardis-bundle
 
-
-      - name: create local channel
+      - name: create and index local channel
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             OS_SUBDIR=linux-64
@@ -68,12 +67,6 @@ jobs:
           fi
           mkdir -p $CHANNEL_PATH/$OS_SUBDIR
           cp $OS_SUBDIR/zipline-tardis-bundle*.tar.bz2 $CHANNEL_PATH/$OS_SUBDIR/
-        env:
-          OS_SUBDIR: ${{ steps.os_subdir.outputs.value }}
-          CHANNEL_PATH: ${{ steps.channel_path.outputs.value }}
-
-      - name: index local channel
-        run: |
           conda activate recipe
           conda index $CHANNEL_PATH
 
