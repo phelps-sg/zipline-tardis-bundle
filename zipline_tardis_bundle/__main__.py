@@ -24,7 +24,7 @@ def main() -> None:
     zipline_dir = os.path.join(home_dir, ".zipline")
     os.makedirs(zipline_dir, exist_ok=True)
     dest_file = os.path.join(zipline_dir, filename)
-    module_dir = os.path.basename(__file__)
+    module_dir = os.path.dirname(__file__)
     source_file = os.path.join(module_dir, filename)
     shutil.copy(source_file, dest_file)
 
