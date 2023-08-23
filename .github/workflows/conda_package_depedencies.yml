@@ -53,12 +53,18 @@ jobs:
 
       - name: upload windows
         if: ${{ matrix.os == 'windows-latest' }}
-        run: anaconda upload win-64/*.tar.bz2
+        run: |
+          conda activate recipe
+          anaconda upload win-64/*.tar.bz2
 
       - name: upload linux
         if: ${{ matrix.os  == 'ubuntu-latest' }}
-        run: anaconda upload linux-64/*.tar.bz2
+        run: |
+          conda activate recipe
+          anaconda upload linux-64/*.tar.bz2
 
       - name: upload macos
         if: ${{ matrix.os == 'macos-latest' }}
-        run: anaconda upload osx-64/*.tar.bz2
+        run: |
+          conda activate recipe
+          anaconda upload osx-64/*.tar.bz2
