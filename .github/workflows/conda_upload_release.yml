@@ -12,7 +12,9 @@ jobs:
       matrix:
         os: ['linux-64', 'win-64']
         python: ['3.10']
-
+    defaults:
+      run:
+        shell: bash -l {0}
     env:
       ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
 
