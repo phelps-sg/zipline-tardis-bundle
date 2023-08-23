@@ -26,7 +26,8 @@ jobs:
 
       # Download the corresponding artifact based on the matrix OS
       - name: Download artifact
-        uses: actions/download-artifact@v2
+        workflow: conda_test.yml
+        uses: dawidd6/action-download-artifact@v2
         with:
           name: build-${{ matrix.os }}
 
