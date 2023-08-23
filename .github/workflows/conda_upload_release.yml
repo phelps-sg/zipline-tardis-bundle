@@ -11,6 +11,7 @@ jobs:
     strategy:
       matrix:
         os: ['linux-64', 'win-64']
+        python: ['3.10']
 
     env:
       ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
@@ -22,7 +23,12 @@ jobs:
         with:
           miniconda-version: "latest"
           auto-update-conda: true
-          activate-environment: test
+          activate-environment: upload
+
+      - name: configure upload conda environment
+        run: |
+          conda create -n upload python=${{ matrix.python }}
+          conda install -y -n upload anaconda-client
 
       - name: conda info
         run: |
@@ -38,7 +44,7 @@ jobs:
 
       # Install anaconda-client if not available in the test environment
       - name: Install Anaconda client
-        run: conda install -y -n test anaconda-client
+        run: conda install -y -n upload anaconda-client
 
       # Ensure version consistency between the GitHub release and the conda package
 #      - name: Check version consistency
@@ -54,4 +60,5 @@ jobs:
       # Uploading to Anaconda
       - name: Upload to Anaconda
         run: |
+          conda activate upload
           anaconda upload *.tar.bz2
