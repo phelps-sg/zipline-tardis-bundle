@@ -27,7 +27,7 @@ import os
 import re
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Any, Callable, Iterator, List, Mapping, Pattern, Sized, Tuple, Iterable
+from typing import Any, Callable, Iterator, List, Mapping, Pattern, Sized, Tuple, Iterable, Union
 from urllib.error import HTTPError
 
 import numpy as np
@@ -73,7 +73,7 @@ class _ResampleData:
         return _ResampleData(self.filename, new_dfr)
 
 
-def utc_timestamp(date: str | pd.Timestamp) -> pd.Timestamp:
+def utc_timestamp(date: Union[str, pd.Timestamp]) -> pd.Timestamp:
     return pd.Timestamp(date, tz="UTC")
 
 

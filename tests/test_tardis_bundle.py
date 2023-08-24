@@ -21,7 +21,7 @@ import shutil
 import tempfile
 from contextlib import ExitStack
 from dataclasses import dataclass
-from typing import Iterator, List, Set
+from typing import Iterator, List, Set, Union
 from unittest.mock import MagicMock, call
 
 import pandas as pd
@@ -85,11 +85,11 @@ class MockRay:
         pass
 
 
-def microseconds(seconds: int | float) -> float:
+def microseconds(seconds: Union[int, float]) -> float:
     return seconds * 10e5
 
 
-def timestamp(offset: int | float, start: datetime.datetime) -> float:
+def timestamp(offset: Union[int, float], start: datetime.datetime) -> float:
     return microseconds(start.timestamp() + offset)
 
 
