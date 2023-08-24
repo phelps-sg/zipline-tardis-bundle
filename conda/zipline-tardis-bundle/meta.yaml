@@ -15,11 +15,11 @@ requirements:
   build:
     - python
     - cython
-    - numpy
+    - numpy>=1.25
   host:
     - python
     - cython
-    - numpy>=1.25
+    - numpy
     - pip
   run:
     - python>=3.8,<3.11
