@@ -30,11 +30,13 @@ from functools import lru_cache
 from typing import (
     Any,
     Callable,
+    Dict,
     Iterable,
     Iterator,
     List,
     Mapping,
     Pattern,
+    Set,
     Sized,
     Tuple,
     Union,
@@ -562,12 +564,12 @@ def _data_pipeline(
 
 
 @lru_cache
-def exchange_details_cached(exchange: str) -> dict:
+def exchange_details_cached(exchange: str) -> Dict[Any, Any]:
     return get_exchange_details(exchange)
 
 
 @lru_cache
-def all_symbols(exchange: str) -> set[str]:
+def all_symbols(exchange: str) -> Set[str]:
     """
     Query the Tardis API to obtain the entire set of symbols for the
     specified exchange.
@@ -583,7 +585,7 @@ _currency_reg_ex = re.compile(r"^([A-Z0-9]+)-([A-Z0-9]+)$")
 
 
 @lru_cache
-def live_symbols_since(exchange: str, date: str, fiat_currency: str = None) -> set[str]:
+def live_symbols_since(exchange: str, date: str, fiat_currency: str = None) -> Set[str]:
     """
     Query the Tardis API to obtain the set of symbols that are
     currently actively traded and also have historical data
