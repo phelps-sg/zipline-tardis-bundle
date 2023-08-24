@@ -98,11 +98,11 @@ def empty_pricing_data(*args: str) -> pd.DataFrame:
 
 
 def quotes_df(
-    timestamps: list[float],
-    ask_prices: list[float],
-    bid_prices: list[float],
-    ask_amounts: list[float],
-    bid_amounts: list[float],
+    timestamps: List[float],
+    ask_prices: List[float],
+    bid_prices: List[float],
+    ask_amounts: List[float],
+    bid_amounts: List[float],
     asset: Asset,
 ) -> pd.DataFrame:
     return pd.DataFrame(
