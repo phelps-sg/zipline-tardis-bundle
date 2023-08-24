@@ -3,7 +3,7 @@
 [![Conda Test](https://github.com/phelps-sg/zipline-tardis-bundle/actions/workflows/conda_test.yml/badge.svg)](https://github.com/phelps-sg/zipline-tardis-bundle/actions/workflows/conda_test.yml)
 [![Anaconda-Server Badge](https://anaconda.org/mesonomics/zipline-tardis-bundle/badges/platforms.svg)](https://anaconda.org/mesonomics/zipline-tardis-bundle)
 [![Anaconda-Server Badge](https://anaconda.org/mesonomics/zipline-tardis-bundle/badges/version.svg)](https://anaconda.org/mesonomics/zipline-tardis-bundle)
-[![Anaconda-Server Badge](https://anaconda.org/mesonomics/zipline-tardis-bundle/badges/downloads.svg)](https://anaconda.org/mesonomics/zipline-tardis-bundle)
+[![Anaconda-Server Badge](https://img.shields.io/conda/dn/mesonomics/zipline-tardis-bundle)](https://anaconda.org/mesonomics/zipline-tardis-bundle)
 
 A bundle for [zipline-reloaded](https://zipline.ml4trading.io/) to allow data for crypto assets to be ingested from 
 [Tardis](https://tardis.dev/).
