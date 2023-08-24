@@ -1,4 +1,4 @@
-from zipline_tardis_bundle import register_tardis_bundle, live_symbols_since
+from zipline_tardis_bundle import live_symbols_since, register_tardis_bundle
 
 # pylint: disable=line-too-long
 # noinspection SpellCheckingInspection

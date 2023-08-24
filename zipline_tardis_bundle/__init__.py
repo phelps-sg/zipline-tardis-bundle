@@ -27,7 +27,18 @@ import os
 import re
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Any, Callable, Iterator, List, Mapping, Pattern, Sized, Tuple, Iterable, Union
+from typing import (
+    Any,
+    Callable,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Pattern,
+    Sized,
+    Tuple,
+    Union,
+)
 from urllib.error import HTTPError
 
 import numpy as np
@@ -338,7 +349,7 @@ def _write_pipeline(
 
     for sid, data, metadata in pipeline:
         writer.write([(sid, data)])
-        metadata_df.iloc[sid] = metadata
+        metadata_df.iloc[sid] = metadata  # type: ignore
 
     return metadata_df
 

@@ -21,13 +21,13 @@ import shutil
 import tempfile
 from contextlib import ExitStack
 from dataclasses import dataclass
+from datetime import timezone
 from typing import Iterator, List, Set, Union
 from unittest.mock import MagicMock, call
 
 import pandas as pd
 import zipline.utils.paths as pth
 from exchange_calendars import ExchangeCalendar
-from datetime import timezone
 from fn import F
 from numpy import dtype
 from pytest import fixture
@@ -57,17 +57,17 @@ from zipline.utils.run_algo import BenchmarkSpec
 
 import zipline_tardis_bundle as tb
 from zipline_tardis_bundle import (
-    Asset,
     CALENDAR_24_7,
     EMPTY_FILE_SIZE,
+    Asset,
     TardisBundle,
     assets_to_strs,
+    strs_to_assets,
     tardis_bundle,
     tardis_files,
     tardis_ingester,
     to_tardis_date,
-    strs_to_assets,
-    utc_timestamp
+    utc_timestamp,
 )
 
 ZIPLINE_TEST_DIR = "./data/testing/zipline"
