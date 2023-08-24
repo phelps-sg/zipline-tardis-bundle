@@ -55,17 +55,19 @@ from zipline.pipeline.loaders import USEquityPricingLoader
 from zipline.utils.cache import dataframe_cache, working_dir
 from zipline.utils.run_algo import BenchmarkSpec
 
-import zipline_tardis_bundle as tb
-from zipline_tardis_bundle import (
+import zipline_tardis_bundle.bundle as tb
+from zipline_tardis_bundle.bundle import (
     CALENDAR_24_7,
     EMPTY_FILE_SIZE,
-    Asset,
     TardisBundle,
-    assets_to_strs,
-    strs_to_assets,
     tardis_bundle,
     tardis_files,
     tardis_ingester,
+)
+from zipline_tardis_bundle.util import (
+    Asset,
+    assets_to_strs,
+    strs_to_assets,
     to_tardis_date,
     utc_timestamp,
 )
@@ -298,7 +300,7 @@ class TestTardisBundle:
             return tb._ResampleData(filename, mock_dir[filename])
 
         mocker.patch(
-            "zipline_tardis_bundle._read_quotes_data",
+            "zipline_tardis_bundle.bundle._read_quotes_data",
             side_effect=mock_read_quotes_data,
         )
 
@@ -424,15 +426,15 @@ class TestTardisBundle:
         test_exchange = "coinbase"
 
         mocker.patch(
-            "zipline_tardis_bundle.CSV_DIR",
+            "zipline_tardis_bundle.bundle.CSV_DIR",
             "./data/tardis_bundle",
         )
         mocker.patch(
-            "zipline_tardis_bundle._download_data",
+            "zipline_tardis_bundle.bundle._download_data",
             return_value=None,
         )
         mocker.patch(
-            "zipline_tardis_bundle._data_pipeline",
+            "zipline_tardis_bundle.bundle._data_pipeline",
             return_value=[
                 (i, test_pricing_data, tb._generate_metadata(test_pricing_data, pair))
                 for i, pair in enumerate(test_pairs)
@@ -500,11 +502,11 @@ class TestTardisBundle:
             return iter(test_files_by_asset[asset])
 
         mocker.patch(
-            "zipline_tardis_bundle._resample_and_merge",
+            "zipline_tardis_bundle.bundle._resample_and_merge",
             return_value=test_pricing_data,
         )
         mocker.patch(
-            "zipline_tardis_bundle.tardis_files",
+            "zipline_tardis_bundle.bundle.tardis_files",
             side_effect=get_test_filenames,
         )
         mocker.patch("os.scandir", return_value=None)
@@ -539,11 +541,11 @@ class TestTardisBundle:
         # Test data files are already provided in the repo
         #  so patch download_quotes_data to do nothing.
         mocker.patch(
-            "zipline_tardis_bundle.download_quotes_data",
+            "zipline_tardis_bundle.bundle.download_quotes_data",
             return_value=None,
         )
         mocker.patch(
-            "zipline_tardis_bundle.CSV_DIR",
+            "zipline_tardis_bundle.bundle.CSV_DIR",
             "./data/tardis_bundle",
         )
         trading_calendar = ingest(
