@@ -103,7 +103,7 @@ jobs:
         uses: actions/upload-artifact@v3
         if: ${{ matrix.os == 'macos-latest' }}
         with:
-          name: build-osx-64-${{ matrix.python >>
+          name: build-osx-64-${{ matrix.python }}
           path: osx-64/*.tar.bz2
 
       - name: store linux result
