@@ -19,8 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-#        python: [ '3.7', '3.8', '3.9', '3.10' ]
-        python: [ '3.10' ]
+        python: [ '3.8', '3.9', '3.10' ]
 
     steps:
 
@@ -104,19 +103,19 @@ jobs:
         uses: actions/upload-artifact@v3
         if: ${{ matrix.os == 'macos-latest' }}
         with:
-          name: build-osx-64
+          name: build-osx-64-${{ matrix.python >>
           path: osx-64/*.tar.bz2
 
       - name: store linux result
         uses: actions/upload-artifact@v3
         if: ${{ matrix.os == 'ubuntu-latest' }}
         with:
-          name: build-linux-64
+          name: build-linux-64-${{ matrix.python }}
           path: linux-64/*.tar.bz2
 
       - name: store windows result
         uses: actions/upload-artifact@v3
         if: ${{ matrix.os == 'windows-latest' }}
         with:
-          name: build-win-64
+          name: build-win-64-${{ matrix.python }}
           path: win-64/*.tar.bz2
