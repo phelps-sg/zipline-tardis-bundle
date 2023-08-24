@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: ['linux-64', 'win-64']
-        python: ['3.10']
+        os: [ 'linux-64', 'win-64' ]
+        python: [ '3.8', '3.9', '3.10' ]
     defaults:
       run:
         shell: bash -l {0}
@@ -42,7 +42,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           workflow: conda_test.yml
-          name: build-${{ matrix.os }}
+          name: build-${{ matrix.os }}-${{ matrix.python }}
 
       # Install anaconda-client if not available in the test environment
       - name: Install Anaconda client
