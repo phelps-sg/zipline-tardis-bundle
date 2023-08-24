@@ -1,6 +1,7 @@
 name: zipline-tardis-bundle
 channels:
  - conda-forge
+ - mesonomics
 dependencies:
  - boa
  - anaconda-client
@@ -15,14 +16,12 @@ dependencies:
  - pytest-mock
  - mypy
  - zipline-reloaded
- - pyfolio-reloaded
  - pip
  - ray-default
  - grpcio=1.43
- - openai
  - fn
  - pykalman
+ - tardis-client
+ - tardis-dev
  - pip:
-   - tardis-client
-   - tardis_dev
    - -e ./
