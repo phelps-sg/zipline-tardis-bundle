@@ -19,8 +19,6 @@ See:
     - https://zipline.ml4trading.io/bundles.html
     - https://tardis.dev/
 """
-from __future__ import annotations
-
 import logging
 
 from .bundle import (
