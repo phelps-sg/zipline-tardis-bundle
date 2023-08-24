@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="zipline-tardis-bundle",
-    version="0.3.0",
+    version="0.3.1",
     packages=["zipline_tardis_bundle"],
     license="Apache License, Version 2.0",
     author="Steve Phelps",
