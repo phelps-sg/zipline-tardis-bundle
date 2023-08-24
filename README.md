@@ -6,7 +6,7 @@
 [![Anaconda-Server Badge](https://img.shields.io/conda/l/mesonomics/zipline-tardis-bundle.svg)](https://anaconda.org/mesonomics/zipline-tardis-bundle)
 [![Anaconda-Server Badge](https://img.shields.io/conda/dn/mesonomics/zipline-tardis-bundle)](https://anaconda.org/mesonomics/zipline-tardis-bundle)
 
-A [data bundle[(https://zipline.ml4trading.io/bundles.html) for [zipline-reloaded](https://zipline.ml4trading.io/) to allow data for crypto assets to be ingested from 
+A [data bundle](https://zipline.ml4trading.io/bundles.html) for [zipline-reloaded](https://zipline.ml4trading.io/) to allow data for crypto assets to be ingested from 
 [Tardis](https://tardis.dev/).
 
 ## Installation
