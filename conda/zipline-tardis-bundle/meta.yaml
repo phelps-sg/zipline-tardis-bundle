@@ -19,7 +19,7 @@ requirements:
   host:
     - python
     - cython
-    - numpy
+    - numpy>=1.25
     - pip
   run:
     - python>=3.8,<3.11
