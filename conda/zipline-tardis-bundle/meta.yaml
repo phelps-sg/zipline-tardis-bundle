@@ -22,7 +22,7 @@ requirements:
     - numpy
     - pip
   run:
-    - python>=3.8,<3.11
+    - python>=3.8
     - numpy
     - pandas
     - zipline-reloaded>=3.0.3
