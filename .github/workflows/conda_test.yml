@@ -51,7 +51,7 @@ jobs:
       - name: conda build for ${{ matrix.os }}
         run: |
           conda activate recipe
-          if [[ "${{ matrix.os }}" == "ubuntu-latest ]]; then
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             BUILD_CMD=mambabuild
           else
             BUILD_CMD=build 
