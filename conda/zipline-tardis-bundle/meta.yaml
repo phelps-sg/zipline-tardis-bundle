@@ -31,7 +31,6 @@ requirements:
     - ray-default>=2.6.3
     - grpcio>=1.43
     - fn
-    - pykalman
 
 test:
   commands:
