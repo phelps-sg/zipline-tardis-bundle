@@ -1,6 +1,7 @@
 # zipline-tardis-bundle
 
 [![Conda Test](https://github.com/phelps-sg/zipline-tardis-bundle/actions/workflows/conda_test.yml/badge.svg)](https://github.com/phelps-sg/zipline-tardis-bundle/actions/workflows/conda_test.yml)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Anaconda-Server Badge](https://img.shields.io/conda/pn/mesonomics/zipline-tardis-bundle.svg)](https://anaconda.org/mesonomics/zipline-tardis-bundle)
 [![Anaconda-Server Badge](https://img.shields.io/conda/v/mesonomics/zipline-tardis-bundle.svg)](https://anaconda.org/mesonomics/zipline-tardis-bundle)
 [![Anaconda-Server Badge](https://img.shields.io/conda/l/mesonomics/zipline-tardis-bundle.svg)](https://anaconda.org/mesonomics/zipline-tardis-bundle)
