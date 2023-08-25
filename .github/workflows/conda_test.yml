@@ -51,7 +51,12 @@ jobs:
       - name: conda build for ${{ matrix.os }}
         run: |
           conda activate recipe
-          conda mambabuild --output-folder . -c conda-forge -c mesonomics --python ${{ matrix.python }} conda/zipline-tardis-bundle
+          if [[ "${{ matrix.os }}" == "ubuntu-latest ]]; then
+            BUILD_CMD=mambabuild
+          else
+            BUILD_CMD=build 
+          fi
+          conda $BUILD_CMD --output-folder . -c conda-forge -c mesonomics --python ${{ matrix.python }} conda/zipline-tardis-bundle
 
       - name: create and index local channel
         run: |
