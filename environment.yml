@@ -5,7 +5,7 @@ channels:
 dependencies:
  - boa
  - anaconda-client
- - python=3.11
+ - python=3.10
  - numpy
  - pandas
  - pandas-stubs
@@ -17,7 +17,7 @@ dependencies:
  - mypy
  - zipline-reloaded
  - pip
- - ray-default
+ - ray-default>=2.6.3
  - grpcio=1.43
  - fn
  - pykalman
