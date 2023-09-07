@@ -90,7 +90,7 @@ test-pre-commit:
 	$(CONDA_ACTIVATE); pre-commit run --all
 
 test-pytest:
-	$(CONDA_ACTIVATE); pytest
+	$(CONDA_ACTIVATE); cd tests; pytest
 
 test: test-pytest test-pre-commit
 
