@@ -288,6 +288,16 @@ class TestTardisBundle:
         }
         assert len(dividends) == 0
 
+    def test_resample_and_merge_empty(self):
+        result = tb._resample_and_merge(
+            "NotDir",
+            iter([]),
+            ray_client=MockRay(),  # type: ignore
+            to_future=lambda f: f,
+            frequency="1Min",
+        )
+        assert result is None
+
     def test_resample_and_merge(
         self, mocker, tardis_quotes_1: pd.DataFrame, tardis_quotes_2: pd.DataFrame
     ):

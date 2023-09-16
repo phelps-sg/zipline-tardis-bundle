@@ -20,7 +20,17 @@ import os
 import re
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Any, Callable, Iterator, List, Mapping, Pattern, Sized, Tuple
+from typing import (
+    Any,
+    Callable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Pattern,
+    Sized,
+    Tuple,
+)
 from urllib.error import HTTPError
 
 import numpy as np
@@ -436,7 +446,7 @@ def _resample_and_merge(
         [Callable[[str, str, str], pd.DataFrame]],
         Callable[[str, str, str], pd.DataFrame],
     ] = lambda f: ray.remote(f).remote,
-) -> pd.DataFrame:
+) -> Optional[pd.DataFrame]:
     """
     Load the Tardis data in the supplied CSV file names.  The file names
     should correspond to files which contain data for the same asset, but
@@ -456,6 +466,8 @@ def _resample_and_merge(
     data_frames = ray_client.get(
         [process(filename, csv_dir, frequency) for filename in filenames]
     )
+    if len(data_frames) == 0:
+        return None
     result = pd.concat(data_frames, axis=0)
     result.sort_index(inplace=True)
     return result
@@ -505,14 +517,24 @@ def _data_pipeline(
             asset, exchange, start_session, end_session, os.scandir(CSV_DIR)
         )
         pricing_data = _resample_and_merge(CSV_DIR, file_names, frequency)
-        if not _within_range(start_session, end_session, pricing_data):
+        if pricing_data is not None:
+            if not _within_range(start_session, end_session, pricing_data):
+                logger.warning(
+                    (
+                        "Data with timestamps %s to %s outside "
+                        "of specified range %s to %s for asset %s"
+                    ),
+                    earliest_date(pricing_data),
+                    latest_date(pricing_data),
+                    start_session,
+                    end_session,
+                    asset,
+                )
+            logger.info("Ingestion for %s complete.", asset.symbol)
+            yield sid, pricing_data, _generate_metadata(pricing_data, asset)
+        else:
             logger.warning(
-                "Data with timestamps %s to %s outside of specified range %s to %s for asset %s",
-                earliest_date(pricing_data),
-                latest_date(pricing_data),
-                start_session,
-                end_session,
-                asset,
+                "No non-empty data files for %s at %s frequency",
+                asset.symbol,
+                frequency,
             )
-        logger.info("Ingestion for %s complete.", asset.symbol)
-        yield sid, pricing_data, _generate_metadata(pricing_data, asset)
