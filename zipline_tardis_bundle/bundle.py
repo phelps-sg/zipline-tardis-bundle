@@ -513,9 +513,14 @@ def _data_pipeline(
     exchange: str,
     frequency: str,
 ) -> _IngestPipeline:
+    n = len(pairs)
     for sid, asset in enumerate(pairs):
         logger.info(
-            "Ingesting data for %s at %s frequency... ", asset.symbol, frequency
+            "Ingesting data for %s (%d of %d) at %s frequency... ",
+            asset.symbol,
+            sid,
+            n,
+            frequency,
         )
         file_names = tardis_files(
             asset, exchange, start_session, end_session, os.scandir(CSV_DIR)
