@@ -22,7 +22,7 @@ import shutil
 import tempfile
 from contextlib import ExitStack
 from dataclasses import dataclass
-from typing import Iterator, List, Set, Union
+from typing import Dict, Iterator, List, Set, Union
 from unittest.mock import MagicMock, call
 
 import pandas as pd
@@ -136,6 +136,37 @@ class MockDirEntry:
 
     def stat(self):
         return MockSize(self.size)
+
+
+def mock_directory(mocker, mock_dir: Dict[str, pd.DataFrame]):
+    def mock_read_quotes_data(filename: str, _csv_dir: str) -> tb._ResampleData:
+        return tb._ResampleData(filename, mock_dir[filename])
+
+    return mocker.patch(
+        "zipline_tardis_bundle.bundle._read_quotes_data",
+        side_effect=mock_read_quotes_data,
+    )
+
+
+def resample_and_merge(
+    mocker, mock_dir: Dict[str, pd.DataFrame], frequency: str = "1Min"
+) -> pd.DataFrame:
+    mock_directory(mocker, mock_dir)
+
+    return tb._resample_and_merge(
+        "NotDir",
+        iter(mock_dir.keys()),
+        ray_client=MockRay(),  # type: ignore
+        to_future=lambda f: f,
+        frequency=frequency,
+    )
+
+
+@fixture
+def empty_quotes_data() -> pd.DataFrame:
+    return pd.DataFrame(
+        columns=["timestamp", "bid_price", "ask_price", "ask_amount", "bid_amount"]
+    )
 
 
 @fixture
@@ -294,39 +325,15 @@ def test_no_dividends():
     assert len(dividends) == 0
 
 
-def test_resample_and_merge_empty():
-    result = tb._resample_and_merge(
-        "NotDir",
-        iter([]),
-        ray_client=MockRay(),  # type: ignore
-        to_future=lambda f: f,
-        frequency="1Min",
-    )
-    assert result is None
-
-
 def test_resample_and_merge(
     mocker, tardis_quotes_1: pd.DataFrame, tardis_quotes_2: pd.DataFrame
 ):
-    mock_dir = {
-        "coinbase_quotes_2012-01-01_ETH-USD.csv.gz": tardis_quotes_1,
-        "coinbase_quotes_2012-01-02_ETH-USD.csv.gz": tardis_quotes_2,
-    }
-
-    def mock_read_quotes_data(filename: str, _csv_dir: str) -> tb._ResampleData:
-        return tb._ResampleData(filename, mock_dir[filename])
-
-    mocker.patch(
-        "zipline_tardis_bundle.bundle._read_quotes_data",
-        side_effect=mock_read_quotes_data,
-    )
-
-    result = tb._resample_and_merge(
-        "NotDir",
-        iter(mock_dir.keys()),
-        ray_client=MockRay(),  # type: ignore
-        to_future=lambda f: f,
-        frequency="1Min",
+    result = resample_and_merge(
+        mocker,
+        mock_dir={
+            "coinbase_quotes_2012-01-01_ETH-USD.csv.gz": tardis_quotes_1,
+            "coinbase_quotes_2012-01-02_ETH-USD.csv.gz": tardis_quotes_2,
+        },
     )
     assert result is not None
     assert (result.index == result.index.sort_values()).all()
@@ -340,6 +347,23 @@ def test_resample_and_merge(
     assert (
         result.open[4] == result.high[4] == result.low[4] == result.close[4] == 1500.0
     )
+
+
+def test_resample_and_merge_empty_dir(mocker):
+    result = resample_and_merge(mocker, mock_dir=dict())
+    assert result is None
+
+
+def test_resample_and_merge_empty_data(mocker, empty_quotes_data: pd.DataFrame):
+    pricing_data = resample_and_merge(
+        mocker,
+        mock_dir={
+            "coinbase_quotes_2012-01-01_ETH-USD.csv.gz": empty_quotes_data,
+            "coinbase_quotes_2012-01-02_ETH-USD.csv.gz": empty_quotes_data,
+        },
+    )
+    assert pricing_data is not None
+    assert len(pricing_data) == 0
 
 
 # noinspection PyTypeChecker
@@ -356,7 +380,7 @@ def test_asset_file_dict():
         "temporary-file.txt",
     ]
 
-    def test_files() -> Iterator[MockDirEntry]:
+    def mock_files() -> Iterator[MockDirEntry]:
         for name in filenames:
             yield MockDirEntry(name)
         yield MockDirEntry(
@@ -370,7 +394,7 @@ def test_asset_file_dict():
                 test_exchange,
                 pd.Timestamp("2023-02-19"),
                 pd.Timestamp("2023-02-21"),
-                test_files(),  # type: ignore
+                mock_files(),  # type: ignore
             )
         )
 
