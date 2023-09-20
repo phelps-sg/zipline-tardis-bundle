@@ -210,7 +210,9 @@ def tardis_bundle(
     metadata_df = _write_pipeline(minute_bar_writer, minute_pipeline, pairs)
     _ = _write_pipeline(daily_bar_writer, daily_pipeline, pairs)
 
+    logger.info("Writing metadata... ")
     asset_db_writer.write(equities=metadata_df)
+    logger.info("Metadata complete.")
 
     # There are no adjustments for crypto assets but Zipline
     #  still requires empty tables for splits and dividends
