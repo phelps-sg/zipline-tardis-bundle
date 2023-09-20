@@ -163,6 +163,11 @@ def resample_and_merge(
 
 
 @fixture
+def empty_pricing_data_3_days():
+    return empty_pricing_data("2012-01-01", "2012-01-02", "2012-01-03")
+
+
+@fixture
 def empty_quotes_data() -> pd.DataFrame:
     return pd.DataFrame(
         columns=["timestamp", "bid_price", "ask_price", "ask_amount", "bid_amount"]
@@ -566,13 +571,24 @@ def test_data_pipeline(mocker):
         assert metadata[3] == test_pairs[sid].symbol
 
 
-def test_filter_quotes_data():
-    df1 = empty_pricing_data("2012-01-01", "2012-01-02", "2012-01-03")
+def test_filter_quotes_data(empty_pricing_data_3_days: pd.DataFrame):
     result = tb._clean_quotes_data(
-        tb._ResampleData("coinbase_quotes_2012-01-02_ETH-USD.csv.gz", df1)
+        tb._ResampleData(
+            "coinbase_quotes_2012-01-02_ETH-USD.csv.gz", empty_pricing_data_3_days
+        )
     )
     assert result.dfr.index[0].date() == datetime.date(2012, 1, 2)
     assert result.dfr.index[-1].date() == datetime.date(2012, 1, 2)
+
+
+def test_index_to_datetime():
+    def get_ts(day: int) -> float:
+        return datetime.datetime(2012, 1, day).timestamp()
+
+    df = pd.DataFrame({"timestamp": [get_ts(1), get_ts(2), get_ts(3)]})
+    result = tb._index_to_datetime(tb._ResampleData(None, df))
+    for date in result.dfr.index:
+        assert date.tzname() == "UTC"
 
 
 def test_ingest_and_backtest(mocker, zipline_environment):
