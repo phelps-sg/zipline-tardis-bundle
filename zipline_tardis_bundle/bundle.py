@@ -511,7 +511,8 @@ def _data_pipeline(
     exchange: str,
     frequency: str,
 ) -> _IngestPipeline:
-    for sid, asset in enumerate(pairs):
+    sid = 0
+    for asset in pairs:
         logger.info(
             "Ingesting data for %s (sid=%d)  at %s frequency... ",
             asset.symbol,
@@ -537,6 +538,7 @@ def _data_pipeline(
                 )
             logger.info("Ingestion for %s complete.", asset.symbol)
             yield sid, pricing_data, _generate_metadata(pricing_data, asset)
+            sid = sid + 1
         else:
             logger.warning(
                 "No non-empty data files for %s at %s frequency",
