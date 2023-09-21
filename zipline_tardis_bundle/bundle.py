@@ -356,8 +356,6 @@ def _generate_metadata(pricing_data: pd.DataFrame, asset: Asset) -> _Metadata:
     """
     start_date = pricing_data.index[0]
     end_date = pricing_data.index[-1]
-    assert start_date.tzname() == "UTC"
-    assert end_date.tzname() == "UTC"
     return (  # type: ignore
         start_date,
         end_date,
