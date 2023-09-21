@@ -538,8 +538,6 @@ def _data_pipeline(
             logger.info("Ingestion for %s complete.", asset.symbol)
             yield sid, pricing_data, _generate_metadata(pricing_data, asset)
         else:
-            logger.warning(
-                "No non-empty data files for %s at %s frequency",
-                asset.symbol,
-                frequency,
+            raise ValueError(
+                f"No non-empty data files for {asset.symbol} at {frequency} frequency"
             )
