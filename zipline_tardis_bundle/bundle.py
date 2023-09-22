@@ -39,6 +39,7 @@ from fn import F
 from ray.util.client import RayAPIStub, ray
 from tardis_dev import datasets
 from zipline.assets import AssetDBWriter
+from zipline.country import CountryCode
 from zipline.data.adjustments import SQLiteAdjustmentWriter
 from zipline.data.bcolz_daily_bars import BcolzDailyBarWriter
 from zipline.data.bcolz_minute_bars import BcolzMinuteBarWriter
@@ -60,7 +61,7 @@ EMPTY_FILE_SIZE = 20  # The size in bytes of an empty .csv.gz file
 
 MINUTES_PER_DAY = 60 * 24
 
-_Metadata = Tuple[pd.Timestamp, pd.Timestamp, pd.Timestamp, str, str, str]
+_Metadata = Tuple[pd.Timestamp, pd.Timestamp, pd.Timestamp, str, str, str, str]
 _IngestPipeline = Iterator[Tuple[int, pd.DataFrame, _Metadata]]
 
 logger = logging.getLogger(__name__)
@@ -342,6 +343,7 @@ def _generate_empty_metadata(pairs: Sized) -> pd.DataFrame:
         ("symbol", "object"),
         ("calendar_name", "object"),
         ("exchange", "object"),
+        ("country_code", "object"),
     ]
     return pd.DataFrame(np.empty(len(pairs), dtype=data_types))
 
@@ -363,6 +365,7 @@ def _generate_metadata(pricing_data: pd.DataFrame, asset: Asset) -> _Metadata:
         asset.symbol,
         CALENDAR_24_7,
         CALENDAR_24_7,
+        CountryCode.UNITED_STATES,
     )
 
 

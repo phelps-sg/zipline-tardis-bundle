@@ -34,6 +34,7 @@ from pytest import fixture
 from ray.util.client import ray
 from zipline import Blotter, TradingAlgorithm, get_calendar
 from zipline.assets import AssetDBWriter
+from zipline.country import CountryCode
 from zipline.data import bundles
 from zipline.data.adjustments import SQLiteAdjustmentWriter
 from zipline.data.bcolz_daily_bars import BcolzDailyBarReader, BcolzDailyBarWriter
@@ -284,6 +285,7 @@ def test_generate_empty_metadata():
         "symbol",
         "calendar_name",
         "exchange",
+        "country_code",
     }
     assert result.start_date.dtype == dtype("<M8[ns]")
     assert result.end_date.dtype == dtype("<M8[ns]")
@@ -291,6 +293,7 @@ def test_generate_empty_metadata():
     assert result.symbol.dtype == dtype("O")
     assert result.calendar_name.dtype == dtype("O")
     assert result.exchange.dtype == dtype("O")
+    assert result.country_code.dtype == dtype("O")
 
 
 def test_generate_metadata():
@@ -307,6 +310,7 @@ def test_generate_metadata():
             pair.symbol,
             CALENDAR_24_7,
             CALENDAR_24_7,
+            CountryCode.UNITED_STATES,
         )
 
 
