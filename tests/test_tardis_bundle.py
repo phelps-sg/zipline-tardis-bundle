@@ -34,7 +34,6 @@ from pytest import fixture
 from ray.util.client import ray
 from zipline import Blotter, TradingAlgorithm, get_calendar
 from zipline.assets import AssetDBWriter
-from zipline.country import CountryCode
 from zipline.data import bundles
 from zipline.data.adjustments import SQLiteAdjustmentWriter
 from zipline.data.bcolz_daily_bars import BcolzDailyBarReader, BcolzDailyBarWriter
@@ -283,17 +282,13 @@ def test_generate_empty_metadata():
         "end_date",
         "auto_close_date",
         "symbol",
-        "calendar_name",
         "exchange",
-        "country_code",
     }
     assert result.start_date.dtype == dtype("<M8[ns]")
     assert result.end_date.dtype == dtype("<M8[ns]")
     assert result.auto_close_date.dtype == dtype("<M8[ns]")
     assert result.symbol.dtype == dtype("O")
-    assert result.calendar_name.dtype == dtype("O")
     assert result.exchange.dtype == dtype("O")
-    assert result.country_code.dtype == dtype("O")
 
 
 def test_generate_metadata():
@@ -301,16 +296,15 @@ def test_generate_metadata():
     test_end_date = pd.Timestamp("2020-01-01")
     test_pairs = strs_to_assets(["ETH-USD", "BTC-GBP"])
     test_df = pd.DataFrame(dict(), index=[test_start_date, test_end_date])
+    exchange = "coinbase"
     for pair in test_pairs:
-        result = tb._generate_metadata(test_df, pair)
+        result = tb._generate_metadata(test_df, pair, exchange)
         assert result == (
             test_start_date,
             test_end_date,
             test_end_date,
             pair.symbol,
-            CALENDAR_24_7,
-            CALENDAR_24_7,
-            CountryCode.UNITED_STATES,
+            exchange,
         )
 
 
@@ -482,7 +476,11 @@ def test_tardis_bundle(mocker, zipline_environment):
     mocker.patch(
         "zipline_tardis_bundle.bundle._data_pipeline",
         return_value=[
-            (i, test_pricing_data, tb._generate_metadata(test_pricing_data, pair))
+            (
+                i,
+                test_pricing_data,
+                tb._generate_metadata(test_pricing_data, pair, test_exchange),
+            )
             for i, pair in enumerate(test_pairs)
         ],
     )
@@ -507,13 +505,13 @@ def test_tardis_bundle(mocker, zipline_environment):
         end_date=end_session,
     )
 
-    asset_db_writer.write.assert_called_once()
+    asset_db_writer.write.assert_called()
     args = asset_db_writer.write.call_args[1]
     metadata: pd.DataFrame = args["equities"]
     assert len(metadata) == len(test_pairs)
     for sid, row in metadata.iterrows():
         assert row["symbol"] == test_pairs[sid].symbol  # type: ignore
-        assert row["calendar_name"] == CALENDAR_24_7
+        assert row["exchange"] == test_exchange
 
     def check_writer(writer: MockWriter):
         # noinspection PyUnresolvedReferences

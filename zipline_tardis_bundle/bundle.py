@@ -39,11 +39,11 @@ from fn import F
 from ray.util.client import RayAPIStub, ray
 from tardis_dev import datasets
 from zipline.assets import AssetDBWriter
-from zipline.country import CountryCode
 from zipline.data.adjustments import SQLiteAdjustmentWriter
 from zipline.data.bcolz_daily_bars import BcolzDailyBarWriter
 from zipline.data.bcolz_minute_bars import BcolzMinuteBarWriter
 from zipline.data.bundles import register
+from zipline.pipeline.domain import EquityCalendarDomain
 
 from zipline_tardis_bundle.util import (
     Asset,
@@ -57,14 +57,17 @@ from zipline_tardis_bundle.util import (
 
 CSV_DIR = os.environ.get("ZIPLINE_TARDIS_DIR") or "./data/tardis_bundle"
 CALENDAR_24_7 = "24/7"
+COUNTRY_CRYPTO = "XX"
 EMPTY_FILE_SIZE = 20  # The size in bytes of an empty .csv.gz file
 
 MINUTES_PER_DAY = 60 * 24
 
-_Metadata = Tuple[pd.Timestamp, pd.Timestamp, pd.Timestamp, str, str, str, str]
+_Metadata = Tuple[pd.Timestamp, pd.Timestamp, pd.Timestamp, str, str]
 _IngestPipeline = Iterator[Tuple[int, pd.DataFrame, _Metadata]]
 
 logger = logging.getLogger(__name__)
+
+CryptoDomain = EquityCalendarDomain(COUNTRY_CRYPTO, "24/7")
 
 
 @dataclass
@@ -208,11 +211,22 @@ def tardis_bundle(
         pairs, start_session, end_session, exchange, frequency="1D"
     )
 
+    logger.info("Writing assets... ")
     metadata_df = _write_pipeline(minute_bar_writer, minute_pipeline, pairs)
     _ = _write_pipeline(daily_bar_writer, daily_pipeline, pairs)
+    logger.info("Assets complete.")
 
     logger.info("Writing metadata... ")
-    asset_db_writer.write(equities=metadata_df)
+    asset_db_writer.write(
+        equities=metadata_df,
+        exchanges=pd.DataFrame(
+            {
+                "exchange": [exchange],
+                "canonical_name": [exchange],
+                "country_code": [COUNTRY_CRYPTO],
+            }
+        ),
+    )
     logger.info("Metadata complete.")
 
     # There are no adjustments for crypto assets but Zipline
@@ -341,14 +355,14 @@ def _generate_empty_metadata(pairs: Sized) -> pd.DataFrame:
         ("end_date", "datetime64[ns]"),
         ("auto_close_date", "datetime64[ns]"),
         ("symbol", "object"),
-        ("calendar_name", "object"),
         ("exchange", "object"),
-        ("country_code", "object"),
     ]
     return pd.DataFrame(np.empty(len(pairs), dtype=data_types))
 
 
-def _generate_metadata(pricing_data: pd.DataFrame, asset: Asset) -> _Metadata:
+def _generate_metadata(
+    pricing_data: pd.DataFrame, asset: Asset, exchange: str
+) -> _Metadata:
     """
     Generate Zipline metadata for the specified asset and pricing data.
 
@@ -363,9 +377,7 @@ def _generate_metadata(pricing_data: pd.DataFrame, asset: Asset) -> _Metadata:
         end_date,
         end_date,
         asset.symbol,
-        CALENDAR_24_7,
-        CALENDAR_24_7,
-        CountryCode.UNITED_STATES,
+        exchange,
     )
 
 
@@ -539,7 +551,7 @@ def _data_pipeline(
                     asset,
                 )
             logger.info("Ingestion for %s complete.", asset.symbol)
-            yield sid, pricing_data, _generate_metadata(pricing_data, asset)
+            yield sid, pricing_data, _generate_metadata(pricing_data, asset, exchange)
         else:
             raise ValueError(
                 f"No non-empty data files for {asset.symbol} at {frequency} frequency"
