@@ -537,22 +537,21 @@ def _data_pipeline(
             asset, exchange, start_session, end_session, os.scandir(CSV_DIR)
         )
         pricing_data = _resample_and_merge(CSV_DIR, file_names, frequency)
-        if pricing_data is not None:
-            if not _within_range(start_session, end_session, pricing_data):
-                logger.warning(
-                    (
-                        "Data with timestamps %s to %s outside "
-                        "of specified range %s to %s for asset %s"
-                    ),
-                    earliest_date(pricing_data),
-                    latest_date(pricing_data),
-                    start_session,
-                    end_session,
-                    asset,
-                )
-            logger.info("Ingestion for %s complete.", asset.symbol)
-            yield sid, pricing_data, _generate_metadata(pricing_data, asset, exchange)
-        else:
+        if pricing_data is None:
             raise ValueError(
                 f"No non-empty data files for {asset.symbol} at {frequency} frequency"
             )
+        if not _within_range(start_session, end_session, pricing_data):
+            logger.warning(
+                (
+                    "Data with timestamps %s to %s outside "
+                    "of specified range %s to %s for asset %s"
+                ),
+                earliest_date(pricing_data),
+                latest_date(pricing_data),
+                start_session,
+                end_session,
+                asset,
+            )
+        logger.info("Ingestion for %s complete.", asset.symbol)
+        yield sid, pricing_data, _generate_metadata(pricing_data, asset, exchange)
