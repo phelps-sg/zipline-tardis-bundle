@@ -52,14 +52,8 @@ def all_symbols(exchange: str) -> Set[str]:
 _currency_reg_ex = re.compile(r"^([A-Z0-9]+)-([A-Z0-9]+)$")
 
 
-def live_symbols_since(exchange: str, date: str, fiat_currency: str = None) -> Set[str]:
-    return symbols_since(exchange, date, fiat_currency, live_only=True)
-
-
 @lru_cache
-def symbols_since(
-    exchange: str, date: str, fiat_currency: str = None, live_only: bool = False
-) -> Set[str]:
+def live_symbols_since(exchange: str, date: str, fiat_currency: str = None) -> Set[str]:
     """
     Query the Tardis API to obtain the set of symbols that are
     currently actively traded and also have historical data
@@ -70,7 +64,6 @@ def symbols_since(
         to this date or earlier
     @param fiat_currency: Only include pairs for the specified
         fiat currency
-    @param live_only: Only include live symbols
     @return: The corresponding set of symbols
     """
     range_start = utc_timestamp(date)
@@ -78,8 +71,7 @@ def symbols_since(
     return {
         s["id"]
         for s in info["availableSymbols"]
-        if (not live_only)
-        or ("availableTo" not in s)
+        if ("availableTo" not in s)
         and ("availableSince" in s)
         and (pd.Timestamp(s["availableSince"]) <= range_start)
         and (
