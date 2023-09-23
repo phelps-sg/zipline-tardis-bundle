@@ -528,7 +528,7 @@ def _data_pipeline(
 ) -> _IngestPipeline:
     for sid, asset in enumerate(pairs):
         logger.info(
-            "Ingesting data for %s (sid=%d)  at %s frequency... ",
+            "Ingesting data for %s (sid=%d) at %s frequency... ",
             asset.symbol,
             sid,
             frequency,
