@@ -513,15 +513,12 @@ def test_tardis_bundle(mocker, zipline_environment):
         assert row["symbol"] == test_pairs[sid].symbol  # type: ignore
         assert row["exchange"] == test_exchange
 
-    def check_writer(writer: MockWriter):
-        # noinspection PyUnresolvedReferences
-        # type: ignore
-        writer.write.assert_has_calls(
-            [call([(i, test_pricing_data)]) for i in range(len(test_pairs))]
-        )
-
-    check_writer(daily_bar_writer)
-    check_writer(minute_bar_writer)
+    # noinspection PyUnresolvedReferences
+    # type: ignore
+    minute_bar_writer.write.assert_has_calls(
+        [call([(i, test_pricing_data)]) for i in range(len(test_pairs))]
+    )
+    daily_bar_writer.write.assert_called_once()
 
     adjustment_writer.write.assert_called_once()
     args = adjustment_writer.write.call_args[1]

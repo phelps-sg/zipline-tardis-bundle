@@ -212,8 +212,8 @@ def tardis_bundle(
     )
 
     logger.info("Writing assets... ")
-    metadata_df = _write_pipeline(minute_bar_writer, minute_pipeline, pairs)
-    _ = _write_pipeline(daily_bar_writer, daily_pipeline, pairs)
+    metadata_df = _write_minute_pipeline(minute_bar_writer, minute_pipeline, pairs)
+    daily_bar_writer.write(((sid, data) for (sid, data, _) in daily_pipeline))
     logger.info("Assets complete.")
 
     logger.info("Writing metadata... ")
@@ -324,15 +324,17 @@ def download_quotes_data(
     logger.info("Downloading complete.")
 
 
-def _write_pipeline(
-    writer: BcolzMinuteBarWriter | BcolzDailyBarWriter,
+def _write_minute_pipeline(
+    writer: BcolzMinuteBarWriter,
     pipeline: _IngestPipeline,
     pairs: Sized,
 ) -> pd.DataFrame:
     metadata_df = _generate_empty_metadata(pairs)
 
     for sid, data, metadata in pipeline:
+        logger.info("Writing data for %s... ", sid)
         writer.write([(sid, data)])
+        logger.info("Writing for %s complete.", sid)
         metadata_df.iloc[sid] = metadata  # type: ignore
 
     return metadata_df
