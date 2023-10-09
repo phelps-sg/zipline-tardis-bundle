@@ -11,7 +11,7 @@ dependencies:
  - pandas-stubs
  - pre-commit
  - blackd
- - pylint
+ - pylint=2.17.7
  - pytest
  - pytest-mock
  - mypy
