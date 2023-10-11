@@ -23,6 +23,8 @@ from functools import lru_cache
 from typing import (
     Any,
     Callable,
+    Dict,
+    Iterable,
     Iterator,
     List,
     Mapping,
@@ -30,6 +32,7 @@ from typing import (
     Pattern,
     Sized,
     Tuple,
+    Union,
 )
 from urllib.error import HTTPError
 
@@ -63,7 +66,8 @@ EMPTY_FILE_SIZE = 20  # The size in bytes of an empty .csv.gz file
 MINUTES_PER_DAY = 60 * 24
 
 _Metadata = Tuple[pd.Timestamp, pd.Timestamp, pd.Timestamp, str, str]
-_IngestPipeline = Iterator[Tuple[int, pd.DataFrame, _Metadata]]
+_IngestPipeline = Iterator[Tuple[int, pd.DataFrame]]
+_Writer = Union[BcolzMinuteBarWriter, BcolzDailyBarWriter]
 
 logger = logging.getLogger(__name__)
 
@@ -80,10 +84,20 @@ class _ResampleData:
 
 
 def tardis_ingester(
-    pairs: List[Asset], api_key: str, exchange: str, start_date: str, end_date: str
+    pairs: List[Asset],
+    api_key: str,
+    exchange: str,
+    start_date: str,
+    end_date: str,
+    frequencies: Iterable[str],
 ) -> Callable:
     return TardisBundle(
-        pairs, api_key, exchange, pd.Timestamp(start_date), pd.Timestamp(end_date)
+        pairs,
+        api_key,
+        exchange,
+        pd.Timestamp(start_date),
+        pd.Timestamp(end_date),
+        frequencies,
     ).ingest
 
 
@@ -94,14 +108,18 @@ def register_tardis_bundle(
     exchange: str,
     start_date: str,
     end_date: str,
+    frequencies: Iterable[str] = ("1Min", "1D"),
 ) -> None:
     register(
         bundle_name,
-        tardis_ingester(strs_to_assets(pairs), api_key, exchange, start_date, end_date),
+        tardis_ingester(
+            strs_to_assets(pairs), api_key, exchange, start_date, end_date, frequencies
+        ),
         start_session=pd.Timestamp(start_date),
         end_session=pd.Timestamp(end_date),
         calendar_name=CALENDAR_24_7,
         minutes_per_day=MINUTES_PER_DAY,
+        frequencies=frequencies,
     )
 
 
@@ -114,12 +132,14 @@ class TardisBundle:
         exchange: str,
         start_date: pd.Timestamp,
         end_date: pd.Timestamp,
+        frequencies: Iterable[str],
     ):
         self.pairs = pairs
         self.api_key = api_key
         self.exchange = exchange
         self.start_date = start_date
         self.end_date = end_date
+        self.frequencies = frequencies
         self.calendar_name = CALENDAR_24_7
         self.start_session = None
         self.end_session = None
@@ -157,6 +177,7 @@ class TardisBundle:
             self.exchange,
             self.start_date,
             self.end_date,
+            self.frequencies,
         )
 
 
@@ -178,6 +199,7 @@ def tardis_bundle(
     exchange: str,
     start_date: pd.Timestamp,
     end_date: pd.Timestamp,
+    frequencies: Iterable[str],
     ray_client: RayAPIStub = ray,
 ) -> None:
     """
@@ -204,17 +226,20 @@ def tardis_bundle(
     logger.info("Ingesting Tardis pricing data... ")
     ray_client.init()
 
-    minute_pipeline = _data_pipeline(
-        pairs, start_session, end_session, exchange, frequency="1Min"
-    )
-    daily_pipeline = _data_pipeline(
-        pairs, start_session, end_session, exchange, frequency="1D"
-    )
+    metadata_df = _generate_empty_metadata(pairs)
 
+    def write_asset_data(freq: str, writer: _Writer) -> None:
+        writer.write(
+            _data_pipeline(
+                pairs, start_session, end_session, exchange, freq, metadata_df
+            )
+        )
+
+    writers: Dict[str, _Writer] = {"1Min": minute_bar_writer, "1D": daily_bar_writer}
     logger.info("Writing assets... ")
-    metadata_df = _write_minute_pipeline(minute_bar_writer, minute_pipeline, pairs)
-    daily_bar_writer.write(((sid, data) for (sid, data, _) in daily_pipeline))
-    logger.info("Assets complete.")
+    for frequency in frequencies:
+        write_asset_data(frequency, writers[frequency])
+    logger.info("Writing assets complete.")
 
     logger.info("Writing metadata... ")
     asset_db_writer.write(
@@ -322,22 +347,6 @@ def download_quotes_data(
         concurrency=256,
     )
     logger.info("Downloading complete.")
-
-
-def _write_minute_pipeline(
-    writer: BcolzMinuteBarWriter,
-    pipeline: _IngestPipeline,
-    pairs: Sized,
-) -> pd.DataFrame:
-    metadata_df = _generate_empty_metadata(pairs)
-
-    for sid, data, metadata in pipeline:
-        logger.info("Writing data for %s... ", sid)
-        writer.write([(sid, data)])
-        logger.info("Writing for %s complete.", sid)
-        metadata_df.iloc[sid] = metadata  # type: ignore
-
-    return metadata_df
 
 
 def _generate_empty_metadata(pairs: Sized) -> pd.DataFrame:
@@ -527,6 +536,7 @@ def _data_pipeline(
     end_session: pd.Timestamp,
     exchange: str,
     frequency: str,
+    metadata_df: Optional[pd.DataFrame] = None,
 ) -> _IngestPipeline:
     for sid, asset in enumerate(pairs):
         logger.info(
@@ -556,4 +566,10 @@ def _data_pipeline(
                 asset,
             )
         logger.info("Ingestion for %s complete.", asset.symbol)
-        yield sid, pricing_data, _generate_metadata(pricing_data, asset, exchange)
+
+        if metadata_df is not None:
+            metadata_df.iloc[sid] = _generate_metadata(
+                pricing_data, asset, exchange
+            )  # type: ignore
+
+        yield sid, pricing_data
