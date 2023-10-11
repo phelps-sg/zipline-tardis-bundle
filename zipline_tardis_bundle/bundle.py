@@ -74,7 +74,7 @@ logger = logging.getLogger(__name__)
 CryptoDomain = EquityCalendarDomain(COUNTRY_CRYPTO, "24/7")
 
 
-@dataclass
+@dataclass(frozen=True)
 class _ResampleData:
     filename: str
     dfr: pd.DataFrame

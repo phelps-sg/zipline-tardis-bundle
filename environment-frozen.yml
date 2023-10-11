@@ -67,12 +67,12 @@ dependencies:
   - frozenlist=1.4.0=py310h2372a71_1
   - glob2=0.7=py_0
   - google-api-core=2.12.0=pyhd8ed1ab_0
-  - google-auth=2.23.2=pyhca7485f_0
+  - google-auth=2.23.3=pyhca7485f_0
   - googleapis-common-protos=1.60.0=pyhd8ed1ab_0
   - gpustat=1.1.1=pyhd8ed1ab_0
   - greenlet=3.0.0=py310hc6cd4ac_1
   - grpcio=1.43.0=py310ha6b4e5e_0
-  - h5py=3.9.0=nompi_py310ha2ad45a_103
+  - h5py=3.10.0=nompi_py310ha2ad45a_100
   - hdf5=1.14.2=nompi_h4f84152_100
   - html5lib=1.1=pyh9f0ad1d_0
   - icu=73.2=h59595ed_0

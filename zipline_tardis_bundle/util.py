@@ -19,16 +19,11 @@ from typing import Any, Dict, Iterable, List, Set, Union
 
 import pandas as pd
 from tardis_dev import get_exchange_details
-from typing_extensions import override
 
 
-@dataclass
+@dataclass(frozen=True, eq=True)
 class Asset:
     symbol: str
-
-    @override
-    def __hash__(self) -> int:
-        return self.symbol.__hash__()
 
 
 @lru_cache
