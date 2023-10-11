@@ -62,7 +62,7 @@ CSV_DIR = os.environ.get("ZIPLINE_TARDIS_DIR") or "./data/tardis_bundle"
 CALENDAR_24_7 = "24/7"
 COUNTRY_CRYPTO = "XX"
 EMPTY_FILE_SIZE = 20  # The size in bytes of an empty .csv.gz file
-
+DEFAULT_FREQUENCIES = ("1Min", "1D")
 MINUTES_PER_DAY = 60 * 24
 
 _Metadata = Tuple[pd.Timestamp, pd.Timestamp, pd.Timestamp, str, str]
@@ -89,7 +89,7 @@ def tardis_ingester(
     exchange: str,
     start_date: str,
     end_date: str,
-    frequencies: Iterable[str],
+    frequencies: Iterable[str] = DEFAULT_FREQUENCIES,
 ) -> Callable:
     return TardisBundle(
         pairs,
@@ -108,7 +108,7 @@ def register_tardis_bundle(
     exchange: str,
     start_date: str,
     end_date: str,
-    frequencies: Iterable[str] = ("1Min", "1D"),
+    frequencies: Iterable[str] = DEFAULT_FREQUENCIES,
 ) -> None:
     register(
         bundle_name,
@@ -119,7 +119,6 @@ def register_tardis_bundle(
         end_session=pd.Timestamp(end_date),
         calendar_name=CALENDAR_24_7,
         minutes_per_day=MINUTES_PER_DAY,
-        frequencies=frequencies,
     )
 
 
@@ -132,7 +131,7 @@ class TardisBundle:
         exchange: str,
         start_date: pd.Timestamp,
         end_date: pd.Timestamp,
-        frequencies: Iterable[str],
+        frequencies: Iterable[str] = DEFAULT_FREQUENCIES,
     ):
         self.pairs = pairs
         self.api_key = api_key
@@ -199,7 +198,7 @@ def tardis_bundle(
     exchange: str,
     start_date: pd.Timestamp,
     end_date: pd.Timestamp,
-    frequencies: Iterable[str],
+    frequencies: Iterable[str] = DEFAULT_FREQUENCIES,
     ray_client: RayAPIStub = ray,
 ) -> None:
     """
@@ -238,6 +237,7 @@ def tardis_bundle(
     writers: Dict[str, _Writer] = {"1Min": minute_bar_writer, "1D": daily_bar_writer}
     logger.info("Writing assets... ")
     for frequency in frequencies:
+        logger.debug("Writing data for frequency %s", frequency)
         write_asset_data(frequency, writers[frequency])
     logger.info("Writing assets complete.")
 

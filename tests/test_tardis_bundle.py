@@ -23,7 +23,7 @@ import tempfile
 from contextlib import ExitStack
 from dataclasses import dataclass
 from typing import Dict, Iterator, List, Set, Union
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock
 
 import pandas as pd
 import zipline.utils.paths as pth
@@ -73,6 +73,8 @@ from zipline_tardis_bundle.util import (
 
 ZIPLINE_TEST_DIR = "./data/testing/zipline"
 
+logger = logging.getLogger(__name__)
+
 
 class MockRay:
     @staticmethod
@@ -90,7 +92,8 @@ def microseconds(seconds: Union[int, float]) -> float:
     return seconds * 10e5
 
 
-def timestamp(offset: Union[int, float], start: datetime.datetime) -> float:
+def timestamp(offset: Union[int, float], year: int, month: int, day: int) -> float:
+    start = datetime.datetime(year, month, day, tzinfo=datetime.timezone.utc)
     return microseconds(start.timestamp() + offset)
 
 
@@ -177,7 +180,7 @@ def empty_quotes_data() -> pd.DataFrame:
 @fixture
 def tardis_quotes_1() -> pd.DataFrame:
     return quotes_df(
-        timestamps=[timestamp(t, datetime.datetime(2012, 1, 1)) for t in [0, 61, 62]],
+        timestamps=[timestamp(t, 2012, 1, 1) for t in [0, 61, 62]],
         ask_prices=[1691.82, 1691.80, 2000],
         bid_prices=[1691.81, 1691.79, 1000],
         ask_amounts=[0.24, 0.25, 1.0],
@@ -189,9 +192,7 @@ def tardis_quotes_1() -> pd.DataFrame:
 @fixture
 def tardis_quotes_2() -> pd.DataFrame:
     return quotes_df(
-        timestamps=[
-            timestamp(t, datetime.datetime(2012, 1, 2)) for t in [120, 170, 240]
-        ],
+        timestamps=[timestamp(t, 2012, 1, 2) for t in [120, 170, 240]],
         ask_prices=[200, 20, 2000],
         bid_prices=[100, 10, 1000],
         ask_amounts=[1.0, 2.5, 5.0],
@@ -202,11 +203,16 @@ def tardis_quotes_2() -> pd.DataFrame:
 
 @fixture
 def tardis_quotes_3() -> pd.DataFrame:
+    def timestamp_for(hour: int, minute: int) -> datetime.datetime:
+        return datetime.datetime(
+            2012, 1, 1, hour=hour, minute=minute, tzinfo=datetime.timezone.utc
+        )
+
     timestamps = [
-        datetime.datetime(2012, 1, 1, hour=23, minute=59),
-        datetime.datetime(2012, 1, 2, hour=1, minute=0),
-        datetime.datetime(2012, 1, 2, hour=1, minute=1),
-        datetime.datetime(2012, 1, 2, hour=1, minute=2),
+        timestamp_for(hour=23, minute=59),
+        timestamp_for(hour=1, minute=0),
+        timestamp_for(hour=1, minute=1),
+        timestamp_for(hour=1, minute=2),
     ]
     return quotes_df(
         timestamps=[t.timestamp() * 10e5 for t in timestamps],
@@ -440,7 +446,7 @@ def test_extension(mocker, zipline_environment):
 
 
 # pylint: disable=too-many-locals, attribute-defined-outside-init
-def test_tardis_bundle(mocker, zipline_environment):
+def test_bundle(mocker, zipline_environment):
     class MockWriter:
         def write(self, *_args, **_kwargs):
             pass
@@ -460,7 +466,6 @@ def test_tardis_bundle(mocker, zipline_environment):
     start_session = pd.Timestamp(start_date)
     end_session = pd.Timestamp(end_date)
 
-    test_pricing_data = empty_pricing_data(start_date, end_date)
     test_pairs = strs_to_assets(["ETH-USD", "BTC-USD"])
     test_api_key = "TEST-API-KEY"
     test_exchange = "coinbase"
@@ -472,17 +477,6 @@ def test_tardis_bundle(mocker, zipline_environment):
     mocker.patch(
         "zipline_tardis_bundle.bundle._download_data",
         return_value=None,
-    )
-    mocker.patch(
-        "zipline_tardis_bundle.bundle._data_pipeline",
-        return_value=[
-            (
-                i,
-                test_pricing_data,
-                tb._generate_metadata(test_pricing_data, pair, test_exchange),
-            )
-            for i, pair in enumerate(test_pairs)
-        ],
     )
 
     # noinspection PyTypeChecker
@@ -506,18 +500,10 @@ def test_tardis_bundle(mocker, zipline_environment):
     )
 
     asset_db_writer.write.assert_called()
-    args = asset_db_writer.write.call_args[1]
-    metadata: pd.DataFrame = args["equities"]
-    assert len(metadata) == len(test_pairs)
-    for sid, row in metadata.iterrows():
-        assert row["symbol"] == test_pairs[sid].symbol  # type: ignore
-        assert row["exchange"] == test_exchange
 
     # noinspection PyUnresolvedReferences
     # type: ignore
-    minute_bar_writer.write.assert_has_calls(
-        [call([(i, test_pricing_data)]) for i in range(len(test_pairs))]
-    )
+    minute_bar_writer.write.assert_called_once()
     daily_bar_writer.write.assert_called_once()
 
     adjustment_writer.write.assert_called_once()
@@ -553,21 +539,18 @@ def test_data_pipeline(mocker):
     )
     mocker.patch("os.scandir", return_value=None)
 
+    metadata_df = tb._generate_empty_metadata(test_pairs)
     pipeline = tb._data_pipeline(
-        test_pairs,
-        start_session,
-        end_session,
-        "coinbase",
-        test_frequency,
+        test_pairs, start_session, end_session, "coinbase", test_frequency, metadata_df
     )
     result = list(pipeline)
 
     assert len(result) == len(test_pairs)
-    assert len({sid for sid, _, _ in result}) == len(test_pairs)
+    assert len({sid for sid, _, in result}) == len(test_pairs)
 
-    for sid, pricing_data, metadata in result:
+    for sid, pricing_data in result:
         pd.testing.assert_frame_equal(pricing_data, test_pricing_data)
-        assert metadata[3] == test_pairs[sid].symbol
+        assert metadata_df.iloc[sid]["symbol"] == test_pairs[sid].symbol
 
 
 def test_filter_quotes_data(empty_pricing_data_3_days: pd.DataFrame):
