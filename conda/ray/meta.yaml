@@ -1,0 +1,49 @@
+{% set name = "ray" %}
+{% set version = "2.7.1" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  git_url: https://github.com/ray-project/ray
+  git_rev: Ray-2.7.1
+
+build:
+  number: 0
+  skip: true # [py<37 or not x86_64]
+  include_recipe: False
+  script: {{ PYTHON }} -m pip install . -vv
+
+requirements:
+  build:
+    - python
+    - cython
+    - numpy>=1.25
+    - poetry
+  run:
+    - python>=3.8
+    - aiohttp>=3.7
+    - aiohttp-cors
+    - colorful
+    - py-spy>=0.2.0
+    - requests
+#    - gpustat>=1.0.0
+    - grpcio>=1.42.0
+    - opencensus
+    - pydantic<2
+    - prometheus_client>=0.7.1
+    - smart_open
+    - virtualenv >=20.0.24, < 20.21.1
+
+test:
+  imports:
+    - ray
+
+about:
+  home: https://github.com/tardis-dev/tardis-python
+  license: Mozilla Public License 2.0
+
+extra:
+  maintainers:
+   - https://github.com/phelps-sg
