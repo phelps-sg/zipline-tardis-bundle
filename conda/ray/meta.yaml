@@ -13,7 +13,7 @@ build:
   number: 0
   skip: true # [py<37 or not x86_64]
   include_recipe: False
-  script: cd python; {{ PYTHON }} -m pip install . -vv
+  script: ./build.sh
 
 requirements:
   build:
@@ -21,6 +21,7 @@ requirements:
     - cython
     - numpy>=1.25
     - poetry
+    - bazel=5.4.1
   run:
     - python>=3.8
     - aiohttp>=3.7
