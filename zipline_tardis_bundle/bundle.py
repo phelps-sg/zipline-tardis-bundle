@@ -90,6 +90,7 @@ def tardis_ingester(
     start_date: str,
     end_date: str,
     frequencies: Iterable[str] = DEFAULT_FREQUENCIES,
+    num_cpus: Optional[int] = None,
 ) -> Callable:
     return TardisBundle(
         pairs,
@@ -98,6 +99,7 @@ def tardis_ingester(
         pd.Timestamp(start_date),
         pd.Timestamp(end_date),
         frequencies,
+        num_cpus,
     ).ingest
 
 
@@ -109,11 +111,18 @@ def register_tardis_bundle(
     start_date: str,
     end_date: str,
     frequencies: Iterable[str] = DEFAULT_FREQUENCIES,
+    num_cpus: Optional[int] = None,
 ) -> None:
     register(
         bundle_name,
         tardis_ingester(
-            strs_to_assets(pairs), api_key, exchange, start_date, end_date, frequencies
+            strs_to_assets(pairs),
+            api_key,
+            exchange,
+            start_date,
+            end_date,
+            frequencies,
+            num_cpus,
         ),
         start_session=pd.Timestamp(start_date),
         end_session=pd.Timestamp(end_date),
@@ -132,6 +141,7 @@ class TardisBundle:
         start_date: pd.Timestamp,
         end_date: pd.Timestamp,
         frequencies: Iterable[str] = DEFAULT_FREQUENCIES,
+        num_cpus: Optional[int] = None,
     ):
         self.pairs = pairs
         self.api_key = api_key
@@ -139,6 +149,7 @@ class TardisBundle:
         self.start_date = start_date
         self.end_date = end_date
         self.frequencies = frequencies
+        self.num_cpus = num_cpus
         self.calendar_name = CALENDAR_24_7
         self.start_session = None
         self.end_session = None
@@ -177,6 +188,7 @@ class TardisBundle:
             self.start_date,
             self.end_date,
             self.frequencies,
+            self.num_cpus,
         )
 
 
@@ -199,6 +211,7 @@ def tardis_bundle(
     start_date: pd.Timestamp,
     end_date: pd.Timestamp,
     frequencies: Iterable[str] = DEFAULT_FREQUENCIES,
+    num_cpus: Optional[int] = None,
     ray_client: RayAPIStub = ray,
 ) -> None:
     """
@@ -223,7 +236,7 @@ def tardis_bundle(
     _download_data(start_session, end_session, api_key, pairs, exchange)
 
     logger.info("Ingesting Tardis pricing data... ")
-    ray_client.init()
+    ray_client.init(num_cpus=num_cpus)
 
     metadata_df = _generate_empty_metadata(pairs)
 
