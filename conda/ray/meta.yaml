@@ -7,7 +7,7 @@ package:
 
 source:
   git_url: https://github.com/ray-project/ray
-  git_rev: Ray-2.7.1
+  git_rev: ray-2.7.1
 
 build:
   number: 0
