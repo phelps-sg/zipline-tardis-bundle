@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    name: py${{ matrix.python }} on ${{ matrix.os }}
+    name: ${{ matrix.recipe }} for py${{ matrix.python }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     env:
       ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
