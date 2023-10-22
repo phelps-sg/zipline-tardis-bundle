@@ -17,7 +17,6 @@ dependencies:
  - mypy
  - zipline-reloaded
  - pip
- - ray-default>=2.6.3
  - grpcio=1.43
  - fn
  - pykalman
@@ -25,4 +24,5 @@ dependencies:
  - tardis-dev
  - pip:
    - pylint-pytest
+   - ray
    - -e ./
