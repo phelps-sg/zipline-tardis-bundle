@@ -13,7 +13,7 @@ build:
   number: 0
   skip: true # [py<37 or not x86_64]
   include_recipe: False
-  script: {{ PYTHON }} -m pip install . -vv
+  script: cd python; {{ PYTHON }} -m pip install . -vv
 
 requirements:
   build:
