@@ -44,7 +44,7 @@ def all_symbols(exchange: str) -> Set[str]:
     return {s["id"] for s in info["availableSymbols"]}
 
 
-_currency_reg_ex = re.compile(r"^([A-Z0-9]+)-([A-Z0-9]+)$")
+_currency_reg_ex = re.compile(r"^([A-Z0-9]+)[-/]([A-Z0-9]+)$")
 
 
 @lru_cache

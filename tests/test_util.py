@@ -13,12 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import datetime
+from typing import Dict, Set
 
 import pandas as pd
+import pytest
 
 from zipline_tardis_bundle.util import (
     Asset,
     assets_to_strs,
+    live_symbols_since,
     strs_to_assets,
     utc_timestamp,
 )
@@ -46,3 +49,84 @@ def test_strs_to_assets():
     strs = [str(n) for n in range(10)]
     result = strs_to_assets(strs)
     assert result == [Asset(str(n)) for n in range(10)]
+
+
+@pytest.mark.parametrize(
+    ["exchange", "details", "date", "currency", "expected_symbols"],
+    [
+        (
+            "kraken",
+            {
+                "availableSymbols": [
+                    {
+                        "id": "XBT/CAD",
+                        "type": "spot",
+                        "availableSince": "2019-06-04T00:00:00.000Z",
+                    },
+                    {
+                        "id": "XBT/EUR",
+                        "type": "spot",
+                        "availableSince": "2019-06-04T00:00:00.000Z",
+                    },
+                ]
+            },
+            "2019-06-04",
+            "EUR",
+            {"XBT/EUR"},
+        ),
+        (
+            "kraken",
+            {
+                "availableSymbols": [
+                    {
+                        "id": "XBT/CAD",
+                        "type": "spot",
+                        "availableSince": "2019-06-04T00:00:00.000Z",
+                    },
+                    {
+                        "id": "XBT/EUR",
+                        "type": "spot",
+                        "availableSince": "2019-06-04T00:00:00.000Z",
+                    },
+                ]
+            },
+            "2019-01-01",
+            "EUR",
+            set(),
+        ),
+        (
+            "coinbase",
+            {
+                "availableSymbols": [
+                    {
+                        "id": "XBT-CAD",
+                        "type": "spot",
+                        "availableSince": "2019-06-04T00:00:00.000Z",
+                    },
+                    {
+                        "id": "XBT-EUR",
+                        "type": "spot",
+                        "availableSince": "2019-06-04T00:00:00.000Z",
+                    },
+                ]
+            },
+            "2019-06-04",
+            "EUR",
+            {"XBT-EUR"},
+        ),
+    ],
+)
+def test_live_symbols_since(
+    mocker,
+    exchange: str,
+    details: Dict,
+    date: str,
+    currency: str,
+    expected_symbols: Set[str],
+):
+    mocker.patch(
+        "zipline_tardis_bundle.util.exchange_details_cached",
+        return_value=details,
+    )
+    result = live_symbols_since(exchange, date, currency)
+    assert result == expected_symbols

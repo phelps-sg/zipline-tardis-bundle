@@ -30,7 +30,7 @@ from .bundle import (
     register_tardis_bundle,
     tardis_bundle,
 )
-from .util import live_symbols_since
+from .util import all_symbols, live_symbols_since
 
 logging.basicConfig(
     level=logging.DEBUG,
